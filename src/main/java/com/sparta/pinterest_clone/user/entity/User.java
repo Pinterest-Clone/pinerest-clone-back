@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
+    private Long googleId;
     private String profileImage;
     private String firstName;
     private String lastName;
@@ -31,7 +32,20 @@ public class User {
         this.birthday = birthday;
         this.username = email.split("@")[0];
     }
+
+    private User(String email, String password, String birthday, Long googleId) {
+        this.email = email;
+        this.password = password;
+        this.birthday = birthday;
+        this.username = email.split("@")[0];
+        this.googleId = googleId;
+    }
+
     public static User of(String email, String password, String birthday) {
         return new User(email, password, birthday);
     }
+
+//    public static User withGoogleOf(String email, String password, String birthday, Long googleId) {
+//
+//    }
 }
