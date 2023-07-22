@@ -25,7 +25,6 @@ public class UserService {
         }
 
         User user = User.of(email, password, birthday);
-
         userRepository.save(user);
     }
 }
