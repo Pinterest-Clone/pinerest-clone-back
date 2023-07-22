@@ -1,12 +1,14 @@
 package com.sparta.pinterest_clone.user.entity;
 
+import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter @Entity @Setter
+@NoArgsConstructor // (access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +27,8 @@ public class User {
     @Column(nullable = false)
     private String birthday;
 
-    private User(String email, String password, String birthday) {
+    // 테스트 후 privete로 변경할 것
+    public User(String email, String password, String birthday) {
         this.email = email;
         this.password = password;
         this.birthday = birthday;
@@ -33,5 +36,17 @@ public class User {
     }
     public static User of(String email, String password, String birthday) {
         return new User(email, password, birthday);
+    }
+
+    public void update(UpdateProfileRequestDto requestDto){
+        this.firstName = requestDto.getFirstname();
+        this.lastName = requestDto.getLastname();
+        this.introduction = requestDto.getIntroduction();
+        this.myUrl = requestDto.getMyUrl();
+        this.username = requestDto.getUsername();
+    }
+
+    public void setId(long l) {
+        this.userId = l;
     }
 }
