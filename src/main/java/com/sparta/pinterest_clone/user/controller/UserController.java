@@ -23,9 +23,9 @@ public class UserController {
     }
 
     @PutMapping("/settings/profile")
-    public ResponseEntity<?> updateProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public UpdateProfileResponseDto updateProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                            @RequestBody UpdateProfileRequestDto requestDto){
-        userService.updateProfile(userDetails, requestDto);
-        return ResponseEntity.ok().build();
+
+        return userService.updateProfile(userDetails, requestDto);
     }
 }

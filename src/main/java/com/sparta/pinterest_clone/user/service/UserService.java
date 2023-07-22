@@ -1,8 +1,10 @@
 package com.sparta.pinterest_clone.user.service;
 
+import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.dto.LoginRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
+import com.sparta.pinterest_clone.user.dto.UpdateProfileResponseDto;
 import com.sparta.pinterest_clone.user.entity.User;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +38,11 @@ public class UserService {
     }
 
     @Transactional
-    public void updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto) {
+    public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto) {
         User user = findUser(userDetails.getUser().getUserId());
         user.update(requestDto);
 
+       return new UpdateProfileResponseDto(user);
     }
 
     private User findUser(Long id) {

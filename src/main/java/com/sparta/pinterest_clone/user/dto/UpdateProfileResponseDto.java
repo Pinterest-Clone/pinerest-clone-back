@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.user.dto;
 
+import com.sparta.pinterest_clone.user.entity.User;
 import lombok.Data;
 
 @Data
@@ -8,16 +9,17 @@ public class UpdateProfileResponseDto {
 
     private String lastname;
 
-    private String introduce;
+    private String introduction;
 
-    private String url;
+    private String myurl;
     private String username;
 
-    public UpdateProfileResponseDto(String firstname, String lastname, String introduce, String url, String username) {
-        this.firstname = firstname;
-        this.lastname = lastname;
-        this.introduce = introduce;
-        this.url = url;
-        this.username = username;
+    public UpdateProfileResponseDto(User user) {
+        this.firstname = user.getFirstName();
+        this.lastname = user.getLastName();
+        this.introduction = user.getIntroduction();
+        this.myurl = user.getMyUrl();
+        this.username = user.getUsername();
+
     }
 }
