@@ -1,4 +1,4 @@
-package com.sparta.pinterest_clone.pin.config;
+package com.sparta.pinterest_clone.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
