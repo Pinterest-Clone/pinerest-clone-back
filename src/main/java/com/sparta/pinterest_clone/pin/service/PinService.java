@@ -1,6 +1,7 @@
 package com.sparta.pinterest_clone.pin.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
@@ -57,12 +58,18 @@ public class PinService {
         }
     }
 
+    @Transactional
     public ResponseEntity<String> deletePin(Long pinId,UserDetailsImpl userDetails){
         Pin pin = pinRepository.findById(pinId).orElseThrow(()-> new IllegalArgumentException("게시글이 없습니다."));
         User user = userRepository.findById(pin.getUser().getUserId())
                 .orElseThrow(()->new IllegalArgumentException("회원이 없습니다."));
         if(checkAuthority(user,userDetails)){
             pinRepository.delete(pin);
+            //pin과 S3에 저장된 이미지를 전부 삭제
+            for (String key : pin.getImage().keySet()) {
+                DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
+                amazonS3.deleteObject(deleteObjectRequest);
+            }
             return new ResponseEntity("핀 삭제 성공",HttpStatus.OK);
         }else{
             return new ResponseEntity("핀 삭제 실패",HttpStatus.UNAUTHORIZED);
@@ -95,10 +102,15 @@ public class PinService {
         String randomUuid = UUID.randomUUID().toString(); // randomUuid 생성.
         String fileUuid = randomUuid +"."+ extension;  // randomUuid를 사용해 파일 고유의 id 생성. image의 키로 사용.
 
+        // 업로드할 파일의 메타데이터 생성(확장자 / 파일 크기.byte)
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType("image/" + extension);
+        metadata.setContentLength(file.getSize());
+
         //요청 객체
         PutObjectRequest request;
         try {
-            request = new PutObjectRequest(bucket, fileUuid, file.getInputStream(), new ObjectMetadata());
+            request = new PutObjectRequest(bucket, fileUuid, file.getInputStream(), metadata);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

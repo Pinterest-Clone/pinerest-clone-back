@@ -29,6 +29,7 @@ public class Pin extends Timestamped{
     @ManyToOne
     private User user;
 
+
     //commentList
 
 //    @ElementCollection
