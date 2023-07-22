@@ -28,11 +28,9 @@ public class GoogleController {
     }
 
     @GetMapping("/login/oauth2/code/google")
-    public String getAuthorizationCode(@RequestParam(value = "code") String code, HttpServletResponse response) {
-        return googleService.googleLogin(code);
-//
-//        response.setHeader(JwtUtil.AUTHORIZATION_HEADER, jwt);
+    public void getAuthorizationCode(@RequestParam(value = "code") String code, HttpServletResponse response) {
+        String jwt =  googleService.googleLogin(code);
 
-//        return "check headers";
+        response.setHeader(JwtUtil.AUTHORIZATION_HEADER, jwt);
     }
 }
