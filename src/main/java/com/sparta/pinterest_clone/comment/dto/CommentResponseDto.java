@@ -1,6 +1,6 @@
-package com.sparta.pinterest_clone.dto;
+package com.sparta.pinterest_clone.comment.dto;
 
-import com.sparta.pinterest_clone.entity.Comment;
+import com.sparta.pinterest_clone.comment.entity.Comment;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.sparta.pinterest_clone.entity;
+package com.sparta.pinterest_clone.comment.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

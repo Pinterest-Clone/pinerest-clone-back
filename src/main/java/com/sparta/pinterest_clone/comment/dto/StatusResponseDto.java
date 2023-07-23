@@ -1,4 +1,4 @@
-package com.sparta.pinterest_clone.dto;
+package com.sparta.pinterest_clone.comment.dto;
 
 
 public class StatusResponseDto {

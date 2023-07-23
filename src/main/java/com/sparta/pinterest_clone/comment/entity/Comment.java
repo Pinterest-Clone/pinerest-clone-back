@@ -1,6 +1,9 @@
-package com.sparta.pinterest_clone.entity;
+package com.sparta.pinterest_clone.comment.entity;
 
-import com.sparta.pinterest_clone.dto.CommentRequestDto;
+import com.sparta.pinterest_clone.comment.entity.Timestamped;
+import com.sparta.pinterest_clone.comment.dto.CommentRequestDto;
+import com.sparta.pinterest_clone.pin.entity.Pin;
+import com.sparta.pinterest_clone.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +12,6 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@Table(name = "comment")
 @NoArgsConstructor
 public class Comment extends Timestamped{
     @Id

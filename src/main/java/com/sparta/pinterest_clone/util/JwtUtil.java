@@ -25,7 +25,7 @@ public class JwtUtil implements InitializingBean {
 
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
-    private final long TOKEN_EXPIRATION = 1000L * 60 * 60;
+    private final long TOKEN_EXPIRATION = 1000L * 60 * 60 * 24 * 14;
 
     @Value("${jwt.secret}")
     private String secretKey;

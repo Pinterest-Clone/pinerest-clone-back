@@ -3,6 +3,7 @@ package com.sparta.pinterest_clone.pin.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
@@ -32,8 +33,6 @@ public class PinService {
     private final AmazonS3 amazonS3;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-
-
 
 //    public List<PinResponseDto> getAllPins() {
 //        List<Pin> pinlist = pinRepository.findAllByOrderByCreatedAtDesc();

@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Ignore yml.secret file
+application-secret.yml
+
+# Ignore gradle related files and directories
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/

@@ -1,6 +1,7 @@
-package com.sparta.pinterest_clone.entity;
+package com.sparta.pinterest_clone.comment.entity;
 
 
+import com.sparta.pinterest_clone.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

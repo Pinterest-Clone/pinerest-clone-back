@@ -39,7 +39,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
 
             Claims claims = jwtUtil.getUserInfoFromToken(token);
             String username = claims.getSubject();
-            log.info(username);
+            log.info("username: {}", username);
             try {
                 setAuthentication(username);
             } catch (Exception e) {
