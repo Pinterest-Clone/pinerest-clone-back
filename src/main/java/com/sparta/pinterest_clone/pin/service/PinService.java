@@ -65,7 +65,7 @@ public class PinService {
                 .orElseThrow(()->new IllegalArgumentException("회원이 없습니다."));
         if(checkAuthority(user,userDetails)){
             pinRepository.delete(pin);
-            //pin과 S3에 저장된 이미지를 전부 삭제
+            //pin에 연관된 이미지를 버킷에서 전부 삭제
             for (String key : pin.getImage().keySet()) {
                 DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
                 amazonS3.deleteObject(deleteObjectRequest);
