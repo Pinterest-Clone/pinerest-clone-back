@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,6 +66,18 @@ public class User {
         this.myUrl = requestDto.getMyUrl();
         this.nickname = requestDto.getNickname();
         this.image = userimage;
+    }
+
+    public void setId(long l) {
+        this.userId = l;
+    }
+
+    public void update(UpdateProfileRequestDto requestDto){
+        this.firstName = requestDto.getFirstname();
+        this.lastName = requestDto.getLastname();
+        this.introduction = requestDto.getIntroduction();
+        this.myUrl = requestDto.getMyUrl();
+        this.nickname = requestDto.getUsername();
     }
 
     public void setId(long l) {

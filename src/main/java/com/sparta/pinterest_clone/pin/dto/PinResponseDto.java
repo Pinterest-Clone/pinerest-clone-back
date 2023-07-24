@@ -1,9 +1,15 @@
 package com.sparta.pinterest_clone.pin.dto;
 
+import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
+import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Getter
+@NoArgsConstructor
 public class PinResponseDto {
     Long pin_id;
     String title;
@@ -11,15 +17,18 @@ public class PinResponseDto {
     String imageUrl;
     String nickname;
     String userImageUrl;
+    List<CommentResponseDto> comments;
     private Integer likeCounts;
-//    List<Comment> commentList;
 
-    public PinResponseDto(Pin pin) {
+
+
+    public PinResponseDto(Pin pin, List<CommentResponseDto> comments) {
         this.pin_id = pin.getId();
         this.imageUrl = pin.getImage().getImage();
         this.title = pin.getTitle();
         this.content = pin.getContent();
         this.nickname = pin.getUser().getNickname();
+        this.comments = comments;
         this.likeCounts = pin.getPinLikes().size();
 
         if (pin.getUser().getImage() != null) {

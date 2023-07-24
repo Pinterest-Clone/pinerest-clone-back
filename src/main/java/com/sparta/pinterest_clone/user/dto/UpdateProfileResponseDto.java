@@ -12,7 +12,9 @@ public class UpdateProfileResponseDto {
     private String introduction;
 
     private String myurl;
+
     private String nickname;
+
 
     public UpdateProfileResponseDto(User user) {
         this.firstname = user.getFirstName();

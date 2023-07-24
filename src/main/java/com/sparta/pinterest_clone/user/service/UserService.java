@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.user.service;
 
+import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sparta.pinterest_clone.image.ImageRepository;
