@@ -18,6 +18,9 @@ public class PinResponseDto {
     String nickname;
     String userImageUrl;
     List<CommentResponseDto> comments;
+    private Integer likeCounts;
+
+
 
     public PinResponseDto(Pin pin, List<CommentResponseDto> comments) {
         this.pin_id = pin.getId();
@@ -26,6 +29,13 @@ public class PinResponseDto {
         this.content = pin.getContent();
         this.nickname = pin.getUser().getNickname();
         this.comments = comments;
+        this.likeCounts = pin.getPinLikes().size();
+
+        if (pin.getUser().getImage() != null) {
+            this.userImageUrl = pin.getUser().getImage().getImage();
+        } else {
+            this.userImageUrl = null;
+        }
     }
 
     public PinResponseDto(Long id, String imageUrl) {

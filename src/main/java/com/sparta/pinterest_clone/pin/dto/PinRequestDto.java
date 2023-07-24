@@ -9,11 +9,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class PinRequestDto {
     private String title;
     private String content;
-    private MultipartFile image;
 
-    public PinRequestDto(String title, String content, MultipartFile image) {
+
+    public PinRequestDto(String title, String content) {
         this.title = title;
         this.content = content;
-        this.image = image;
+
     }
 }

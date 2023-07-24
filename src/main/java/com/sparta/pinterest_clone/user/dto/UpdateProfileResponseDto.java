@@ -12,14 +12,16 @@ public class UpdateProfileResponseDto {
     private String introduction;
 
     private String myurl;
-    private String username;
+
+    private String nickname;
+
 
     public UpdateProfileResponseDto(User user) {
         this.firstname = user.getFirstName();
         this.lastname = user.getLastName();
         this.introduction = user.getIntroduction();
         this.myurl = user.getMyUrl();
-        this.username = user.getNickname();
+        this.nickname = user.getNickname();
 
     }
 }
