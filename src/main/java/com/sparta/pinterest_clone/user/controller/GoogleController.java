@@ -1,22 +1,13 @@
 package com.sparta.pinterest_clone.user.controller;
 
-import com.sparta.pinterest_clone.user.dto.GoogleInfoDto;
-import com.sparta.pinterest_clone.user.dto.GoogleResponseDto;
 import com.sparta.pinterest_clone.user.service.GoogleService;
 import com.sparta.pinterest_clone.util.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,7 +21,7 @@ public class GoogleController {
 
     @GetMapping("/login/oauth2/code/google")
     public void getAuthorizationCode(@RequestParam(value = "code") String code, HttpServletResponse response) {
-        String jwt =  googleService.googleLogin(code);
+        String jwt = googleService.googleLogin(code);
 
         Cookie cookie = new Cookie(JwtUtil.AUTHORIZATION_HEADER, jwt.substring(7));
         cookie.setPath("/");

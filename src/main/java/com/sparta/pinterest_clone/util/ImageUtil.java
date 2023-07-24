@@ -48,7 +48,6 @@ public class ImageUtil {
     }
 
     public String uploadFileToS3(MultipartFile file, AmazonS3 amazonS3, String bucket) {
-        Map<String, String> images = new LinkedHashMap<>();
         // 새 S3 객체 업로드
         String filename = file.getOriginalFilename(); // 파일의 원본명
         String extension = StringUtils.getFilenameExtension(Paths.get(filename).toString()); // 확장자명
@@ -70,8 +69,6 @@ public class ImageUtil {
         // S3 버킷에 PUT(등록 요청)
         amazonS3.putObject(request);
 
-        // 해당 객체의 Url 값을 String으로 images리스트에 저장
-        images.put(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
         return fileUuid;
     }
 

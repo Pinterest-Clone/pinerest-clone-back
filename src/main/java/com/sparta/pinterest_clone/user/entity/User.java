@@ -77,10 +77,7 @@ public class User {
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
-        this.nickname = requestDto.getUsername();
+        this.nickname = requestDto.getNickname();
     }
-
-    public void setId(long l) {
-        this.userId = l;
-    }
+    
 }
