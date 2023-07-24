@@ -2,8 +2,6 @@ package com.sparta.pinterest_clone.pin.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
@@ -19,15 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 @Slf4j(topic = "pin service")
 @Service
@@ -84,17 +77,19 @@ public class PinService {
         }
     }
 
-    public ResponseEntity<String> createPin(PinRequestDto pinRequestDto
-                                            , MultipartFile image,
+    public ResponseEntity<String> createPin(PinRequestDto pinRequestDto,
+                                            MultipartFile image,
                                             UserDetailsImpl userDetails) {
 //        User
         User user = userDetails.getUser();
         //파일 정보
         MultipartFile file = image;
         //파일 검증
-        if(!imageUtil.validateFile(file)){throw new IllegalArgumentException("파일 검증 실패");}
+        if (!imageUtil.validateFile(file)) {
+            throw new IllegalArgumentException("파일 검증 실패");
+        }
         //S3에 업로드 후 이미지 키 반환.
-        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3,bucket);
+        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);
 
         //핀 이미지 생성.
         PinImage S3ObjectUrl = new PinImage(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());

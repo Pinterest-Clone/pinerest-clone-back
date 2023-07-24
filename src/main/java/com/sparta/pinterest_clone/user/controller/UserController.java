@@ -26,9 +26,9 @@ public class UserController {
 
     @PutMapping("/settings/profile")
     public UpdateProfileResponseDto updateProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                           @RequestPart(required = false) MultipartFile userImage,
-                                           @ModelAttribute UpdateProfileRequestDto requestDto){
+                                                  @RequestPart(required = false) MultipartFile userImage,
+                                                  @ModelAttribute UpdateProfileRequestDto requestDto) {
 
-        return userService.updateProfile(userDetails, requestDto,userImage);
+        return userService.updateProfile(userDetails, requestDto, userImage);
     }
 }

@@ -33,7 +33,7 @@ public class JwtUtil implements InitializingBean {
     private Key key;
 
     @Override
-    public void afterPropertiesSet(){
+    public void afterPropertiesSet() {
         byte[] keyBytes = Base64.getDecoder().decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -86,7 +86,7 @@ public class JwtUtil implements InitializingBean {
     public String getUsernameFromJwt(String token) {
         try {
             String subToken = substringJwt(URLDecoder.decode(token, "UTF-8"));
-            if(validateJwt(subToken)){
+            if (validateJwt(subToken)) {
                 Claims body = getUserInfoFromToken(subToken);
                 log.error(body.get("username", String.class));
                 return body.get("username", String.class);

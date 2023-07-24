@@ -2,10 +2,6 @@ package com.sparta.pinterest_clone.user.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.sparta.pinterest_clone.pin.entity.Pin;
-import com.sparta.pinterest_clone.pin.entity.PinImage;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.dto.LoginRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
@@ -20,16 +16,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -63,10 +52,11 @@ public class UserService {
         MultipartFile file = userImage;
 
 
+        if (!imageUtil.validateFile(file)) {
+            throw new IllegalArgumentException("파일 검증 실패");
+        }
 
-        if(!imageUtil.validateFile(file)){throw new IllegalArgumentException("파일 검증 실패");}
-
-        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3,bucket);
+        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);
 
         User user = findUser(userDetails.getUser().getUserId());
 
@@ -75,8 +65,8 @@ public class UserService {
         userImageRepository.delete(user.getUserimage());
         UserImage S3ObjectUrl = new UserImage(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
 
-        user.update(requestDto ,S3ObjectUrl);
-       return new UpdateProfileResponseDto(user);
+        user.update(requestDto, S3ObjectUrl);
+        return new UpdateProfileResponseDto(user);
     }
 
     private User findUser(Long id) {

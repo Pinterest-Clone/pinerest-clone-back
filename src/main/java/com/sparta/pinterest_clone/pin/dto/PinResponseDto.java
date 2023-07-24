@@ -19,9 +19,9 @@ public class PinResponseDto {
         this.title = pin.getTitle();
         this.content = pin.getContent();
         this.nickname = pin.getUser().getNickname();
-        if(pin.getUser().getUserimage()!=null){
-        this.userImageUrl = pin.getUser().getUserimage().getImage();
-        }else{
+        if (pin.getUser().getUserimage() != null) {
+            this.userImageUrl = pin.getUser().getUserimage().getImage();
+        } else {
             this.userImageUrl = null;
         }
     }
