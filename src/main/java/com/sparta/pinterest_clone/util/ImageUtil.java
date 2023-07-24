@@ -52,7 +52,7 @@ public class ImageUtil {
         // 새 S3 객체 업로드
         String filename = file.getOriginalFilename(); // 파일의 원본명
         String extension = StringUtils.getFilenameExtension(Paths.get(filename).toString()); // 확장자명
-        String fileUuid = UUID.randomUUID().toString(); // 해당 파일의 고유한 이름
+        String fileUuid = UUID.randomUUID()+"."+extension; // 해당 파일의 고유한 이름
 
         // 업로드할 파일의 메타데이터 생성(확장자 / 파일 크기.byte)
         ObjectMetadata metadata = new ObjectMetadata();
