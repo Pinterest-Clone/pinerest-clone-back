@@ -1,19 +1,35 @@
 package com.sparta.pinterest_clone.user.service;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.pinterest_clone.pin.entity.Pin;
+import com.sparta.pinterest_clone.pin.entity.PinImage;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.dto.LoginRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileResponseDto;
 import com.sparta.pinterest_clone.user.entity.User;
+import com.sparta.pinterest_clone.user.entity.UserImage;
+import com.sparta.pinterest_clone.user.repository.UserImageRepository;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
+import com.sparta.pinterest_clone.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -21,6 +37,10 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserImageRepository userImageRepository;
+    private final AmazonS3 amazonS3;
+    private final String bucket;
+    private final ImageUtil imageUtil;
 
     public void signup(LoginRequestDto loginRequestDto) {
         String email = loginRequestDto.getEmail();
@@ -39,14 +59,23 @@ public class UserService {
     @Transactional
     public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto, MultipartFile userImage) {
 
-        if(userImage != null){
-            String url = userImage.getOriginalFilename();
-            //이미지 업로드
-        }
+        //파일 정보
+        MultipartFile file = userImage;
 
+
+
+        if(!imageUtil.validateFile(file)){throw new IllegalArgumentException("파일 검증 실패");}
+
+        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3,bucket);
 
         User user = findUser(userDetails.getUser().getUserId());
-        user.update(requestDto);
+
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getUserimage().getImageKey());
+        amazonS3.deleteObject(deleteObjectRequest);
+        userImageRepository.delete(user.getUserimage());
+        UserImage S3ObjectUrl = new UserImage(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
+
+        user.update(requestDto ,S3ObjectUrl);
        return new UpdateProfileResponseDto(user);
     }
 

@@ -19,7 +19,11 @@ public class PinResponseDto {
         this.title = pin.getTitle();
         this.content = pin.getContent();
         this.nickname = pin.getUser().getNickname();
-//        this.userImageUrl = user.getUserImage()....
+        if(pin.getUser().getUserimage()!=null){
+        this.userImageUrl = pin.getUser().getUserimage().getImage();
+        }else{
+            this.userImageUrl = null;
+        }
     }
 
     public PinResponseDto(Long id, String imageUrl) {

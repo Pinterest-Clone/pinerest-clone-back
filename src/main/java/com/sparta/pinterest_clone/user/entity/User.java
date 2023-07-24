@@ -28,8 +28,8 @@ public class User {
     @Column(nullable = false)
     private String birthday;
 
-//    @OneToOne(cascade = CascadeType.ALL)
-//    private UserImage userimage;
+    @OneToOne(cascade = CascadeType.ALL)
+    private UserImage userimage;
 
     // 테스트 후 privete로 변경할 것
     public User(String email, String password, String birthday) {
@@ -42,12 +42,13 @@ public class User {
         return new User(email, password, birthday);
     }
 
-    public void update(UpdateProfileRequestDto requestDto){
+    public void update(UpdateProfileRequestDto requestDto, UserImage userimage){
         this.firstName = requestDto.getFirstname();
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
         this.nickname = requestDto.getNickname();
+        this.userimage = userimage;
     }
 
     public void setId(long l) {
