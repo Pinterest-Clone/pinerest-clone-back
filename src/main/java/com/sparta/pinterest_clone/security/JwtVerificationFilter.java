@@ -38,10 +38,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
             }
 
             Claims claims = jwtUtil.getUserInfoFromToken(token);
-            String username = claims.getSubject();
-            log.info(username);
+            String email = claims.getSubject();
+            log.info(email);
             try {
-                setAuthentication(username);
+                setAuthentication(email);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -50,15 +50,15 @@ public class JwtVerificationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication auth = createAuthentication(username);
+        Authentication auth = createAuthentication(email);
         context.setAuthentication(auth);
         SecurityContextHolder.setContext(context);
     }
 
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = serviceImpl.loadUserByUsername(username);
+    private Authentication createAuthentication(String email) {
+        UserDetails userDetails = serviceImpl.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }
