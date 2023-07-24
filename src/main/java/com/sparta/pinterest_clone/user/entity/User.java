@@ -14,7 +14,7 @@ import lombok.Setter;
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
+    private String googleId;
     private String firstName;
     private String lastName;
     @Column(nullable = false)
@@ -28,18 +28,27 @@ public class User {
     @Column(nullable = false)
     private String birthday;
 
+    public User updateGoogleId(String googleId) {
+        this.googleId = googleId;
+        return this;
+    }
+
     @OneToOne(cascade = CascadeType.ALL)
     private UserImage userimage;
 
-    // 테스트 후 privete로 변경할 것
     public User(String email, String password, String birthday) {
         this.email = email;
         this.password = password;
         this.birthday = birthday;
         this.nickname = email.split("@")[0];
     }
-    public static User of(String email, String password, String birthday) {
-        return new User(email, password, birthday);
+
+    public User(String email, String password, String birthday, String googleId) {
+        this.email = email;
+        this.password = password;
+        this.birthday = birthday;
+        this.nickname = email.split("@")[0];
+        this.googleId = googleId;
     }
 
     public void update(UpdateProfileRequestDto requestDto, UserImage userimage){

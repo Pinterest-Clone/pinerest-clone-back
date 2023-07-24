@@ -41,7 +41,8 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         }
 
-        User user = User.of(email, password, birthday);
+        User user = new User(email, password, birthday);
+
         userRepository.save(user);
     }
 
