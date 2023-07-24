@@ -2,8 +2,7 @@ package com.sparta.pinterest_clone.comment.controller;
 
 import com.sparta.pinterest_clone.comment.dto.CommentRequestDto;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
-import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
-import com.sparta.pinterest_clone.user.entity.User;
+import com.sparta.pinterest_clone.comment.dto.ResponseDto;
 import com.sparta.pinterest_clone.comment.service.CommentService;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import jakarta.validation.Valid;
@@ -19,19 +18,21 @@ import org.springframework.web.bind.annotation.*;
 public class CommentController {
 
     private final CommentService commentService;
+
     @PostMapping()
     public CommentResponseDto createComment(@PathVariable Long pinId,
                                             @RequestBody @Valid CommentRequestDto requestDto,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         return commentService.createComment(pinId, requestDto, userDetails);
     }
 
-    // 대댓글 작성
+    // 대댓글
     @PostMapping("comments/{commentId}/replies")
     public CommentResponseDto createSubComment(@PathVariable Long pinId,
-                                                               @PathVariable Long commentId,
-                                                               @RequestBody @Valid CommentRequestDto requestDto,
-                                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
+                                               @PathVariable Long commentId,
+                                               @RequestBody @Valid CommentRequestDto requestDto,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return commentService.createSubComment(pinId, commentId, requestDto, userDetails);
     }
@@ -39,25 +40,25 @@ public class CommentController {
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId,
                                                             @RequestBody @Valid CommentRequestDto requestDto,
-                                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
+                                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         return new ResponseEntity<>(commentService.updateComment(commentId, requestDto, userDetails), HttpStatus.OK);
     }
 
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<StatusResponseDto> deleteComment(@PathVariable Long commentId,
-                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
+    public ResponseEntity<ResponseDto> deleteComment(@PathVariable Long commentId,
+                                                     @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
         return new ResponseEntity<>(commentService.deleteComment(commentId, userDetails), HttpStatus.OK);
     }
 
-    @PostMapping("/comments/{commentId}/like")
-    public ResponseEntity<StatusResponseDto> commentLike(@PathVariable Long commentId,
-                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
-        StatusResponseDto statusCodesResponseDto = commentService.commentLike(commentId, userDetails);
-        return new ResponseEntity<>(statusCodesResponseDto, HttpStatus.OK);
-    }
+//    @PostMapping("/comments/{commentId}/like")
+//    public ResponseEntity<ResponseDto> commentLike(@PathVariable Long pinId,
+//                                                         @PathVariable Long commentId,
+//                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+//
+//        return new ResponseEntity<>(commentService.commentLike(pinId, commentId, userDetails), HttpStatus.OK);
+//    }
 
 
 }

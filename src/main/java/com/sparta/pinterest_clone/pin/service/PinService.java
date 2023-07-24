@@ -26,10 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j(topic = "pin service")
@@ -57,9 +54,25 @@ public class PinService {
     public PinResponseDto getPin(Long pinId) {
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         List<Comment> comments = commentRepository.findAllByPinId(pinId);
+
+
+        Map<Long, List<Comment>> commentsByParentId = comments.stream()
+                .filter(c -> c.getParentId() != null)
+                .collect(Collectors.groupingBy(Comment::getParentId));
+
         List<CommentResponseDto> commentList = comments.stream()
-                .map(CommentResponseDto::new)
+                .filter(c -> c.getParentId() == null)
+                .map(comment -> {
+                    Long parentId = comment.getCommentId();
+                    List<CommentResponseDto> subComments =
+                            commentsByParentId.getOrDefault(parentId, new ArrayList<>())
+                                    .stream()
+                                    .map(CommentResponseDto::new)
+                                    .collect(Collectors.toList());
+                    return new CommentResponseDto(comment, subComments);
+                })
                 .collect(Collectors.toList());
+
         return new PinResponseDto(pin, commentList);
     }
 
@@ -75,6 +88,7 @@ public class PinService {
             return new ResponseEntity("핀 수정 실패", HttpStatus.UNAUTHORIZED);
         }
     }
+
 
     @Transactional
     public ResponseEntity<String> deletePin(Long pinId, UserDetailsImpl userDetails) {

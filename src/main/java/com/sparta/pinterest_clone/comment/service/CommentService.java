@@ -2,7 +2,7 @@ package com.sparta.pinterest_clone.comment.service;
 
 import com.sparta.pinterest_clone.comment.dto.CommentRequestDto;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
-import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
+import com.sparta.pinterest_clone.comment.dto.ResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
@@ -23,7 +23,7 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public CommentResponseDto createComment(Long pinId, CommentRequestDto requestDto, UserDetailsImpl userDetails){
+    public CommentResponseDto createComment(Long pinId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
 
         Pin pin = pinRepository.findById(pinId).orElseThrow(()
@@ -31,27 +31,31 @@ public class CommentService {
 
         Comment commentSave = new Comment(pin, requestDto, user);
         Comment comment = commentRepository.save(commentSave);
-        CommentResponseDto responseDto = new CommentResponseDto(comment);
-
-        return responseDto;
-    }
-
-    // 대댓글 작성
-    @Transactional
-    public CommentResponseDto createSubComment(Long pinId, Long commentId, CommentRequestDto requestDto, UserDetailsImpl userDetails){
-        User user = userDetails.getUser();
-
-        Pin pin = pinRepository.findById(pinId).orElseThrow(()
-                -> new EntityNotFoundException("게시글을 찾을 수 없습니다"));
-
-        Comment commentSave = new Comment(pin, commentId, requestDto, user);
-        Comment comment = commentRepository.save(commentSave);
 
         return new CommentResponseDto(comment);
     }
 
+    // 대댓글 작성
     @Transactional
-    public CommentResponseDto updateComment(Long commentId, CommentRequestDto requestDto,UserDetailsImpl userDetails){
+    public CommentResponseDto createSubComment(Long pinId, Long commentId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+
+        Pin pin = pinRepository.findById(pinId).orElseThrow(
+                () -> new EntityNotFoundException("게시글을 찾을 수 없습니다")
+        );
+
+        Comment parentComment = commentRepository.findById(commentId).orElseThrow(
+                () -> new EntityNotFoundException("부모 댓글을 찾을 수 없습니다")
+        );
+
+        Comment subComment = parentComment.createSubComment(pin, commentId, requestDto, user);
+        Comment saveSubComment = commentRepository.save(subComment);
+
+        return new CommentResponseDto(saveSubComment);
+    }
+
+    @Transactional
+    public CommentResponseDto updateComment(Long commentId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         Comment comment = findComment(commentId);
         checkAuthority(comment, user);
@@ -61,15 +65,16 @@ public class CommentService {
     }
 
     @Transactional
-    public StatusResponseDto deleteComment(Long commentId,UserDetailsImpl userDetails){
+    public ResponseDto deleteComment(Long commentId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         Comment comment = findComment(commentId);
         checkAuthority(comment, user);
+
+        commentRepository.findAllByParentId(commentId).forEach(commentRepository::delete);
         commentRepository.delete(comment);
 
-        return new StatusResponseDto(200, "삭제성공");
+        return new ResponseDto("삭제성공");
     }
-
 
     private Comment findComment(Long id) {
         return commentRepository.findById(id).orElseThrow(() ->
@@ -77,17 +82,9 @@ public class CommentService {
         );
     }
 
-    public StatusResponseDto commentLike(Long commentId, UserDetailsImpl userDetails) {
-        return null;
-    }
-    // 수정, 삭제시 권한을 확인 .
     public void checkAuthority(Comment comment, User user) {
-        // admin 확인
-//        if(!user.getRole().getAuthority().equals("ROLE_ADMIN")){
-            // 작성자 본인 확인
-            if (!comment.getUser().getUserId().equals(user.getUserId())) {
-                throw new AuthorizationServiceException("작성자만 삭제/수정할 수 있습니다.");
-            }
-//        }
+        if (!comment.getUser().getUserId().equals(user.getUserId())) {
+            throw new AuthorizationServiceException("작성자만 삭제/수정할 수 있습니다.");
+        }
     }
 }
