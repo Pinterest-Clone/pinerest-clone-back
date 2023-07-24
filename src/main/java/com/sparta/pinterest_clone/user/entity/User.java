@@ -42,7 +42,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.birthday = birthday;
-        this.username = email.split("@")[0];
+        this.nickname = email.split("@")[0];
         this.googleId = googleId;
     }
 }
