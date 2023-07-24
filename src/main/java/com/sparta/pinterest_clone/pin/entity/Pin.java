@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.pin.entity;
 
+import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.user.entity.User;
 import jakarta.persistence.*;
@@ -24,7 +25,7 @@ public class Pin extends Timestamped {
     private String content;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private PinImage image;
+    private Image image;
 
     @ManyToOne
     private User user;
@@ -37,7 +38,7 @@ public class Pin extends Timestamped {
     @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<PinLike> pinLikes = new ArrayList<>();
 
-    public Pin(PinRequestDto postRequestDto, User user, PinImage pinImage) {
+    public Pin(PinRequestDto postRequestDto, User user, Image pinImage) {
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
         this.image = pinImage;

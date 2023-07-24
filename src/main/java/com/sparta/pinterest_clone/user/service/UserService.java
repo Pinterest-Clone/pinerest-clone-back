@@ -2,14 +2,14 @@ package com.sparta.pinterest_clone.user.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.sparta.pinterest_clone.image.ImageRepository;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.dto.LoginRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileResponseDto;
 import com.sparta.pinterest_clone.user.entity.User;
-import com.sparta.pinterest_clone.user.entity.UserImage;
-import com.sparta.pinterest_clone.user.repository.UserImageRepository;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
+import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserImageRepository userImageRepository;
+    private final ImageRepository imageRepository;
     private final AmazonS3 amazonS3;
     private final String bucket;
     private final ImageUtil imageUtil;
@@ -61,13 +61,13 @@ public class UserService {
 
         User user = findUser(userDetails.getUser().getUserId());
 
-        if(user.getUserimage()!=null){
-            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getUserimage().getImageKey());
+        if(user.getImage()!=null){
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getImage().getImageKey());
             amazonS3.deleteObject(deleteObjectRequest);
-            userImageRepository.delete(user.getUserimage());
+            imageRepository.delete(user.getImage());
         }
 
-        UserImage S3ObjectUrl = new UserImage(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
+        Image S3ObjectUrl = new Image(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
 
         user.update(requestDto, S3ObjectUrl);
         return new UpdateProfileResponseDto(user);

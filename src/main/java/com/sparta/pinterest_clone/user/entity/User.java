@@ -1,10 +1,9 @@
 package com.sparta.pinterest_clone.user.entity;
 
-import com.sparta.pinterest_clone.pin.entity.PinImage;
+import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.pin.entity.PinLike;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,11 +11,14 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Entity @Setter
+@Getter
+@Entity
+@Setter
 @NoArgsConstructor // (access = AccessLevel.PROTECTED)
 @Table(name = "users")
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
     private String googleId;
     private String firstName;
@@ -38,7 +40,7 @@ public class User {
     }
 
     @OneToOne(cascade = CascadeType.ALL)
-    private UserImage userimage;
+    private Image image;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<PinLike> pinLikes = new ArrayList<>();
@@ -58,13 +60,13 @@ public class User {
         this.googleId = googleId;
     }
 
-    public void update(UpdateProfileRequestDto requestDto, UserImage userimage){
+    public void update(UpdateProfileRequestDto requestDto, Image userimage) {
         this.firstName = requestDto.getFirstname();
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
         this.nickname = requestDto.getNickname();
-        this.userimage = userimage;
+        this.image = userimage;
     }
 
     public void setId(long l) {

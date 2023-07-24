@@ -1,4 +1,4 @@
-package com.sparta.pinterest_clone.user.entity;
+package com.sparta.pinterest_clone.image;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class UserImage {
+public class Image {
     @Id
     private String imageKey;
 
     @Column(nullable = false)
     private String image;
 
-    public UserImage(String imageKey, String image) {
+    public Image(String imageKey, String image) {
         this.imageKey = imageKey;
         this.image = image;
     }

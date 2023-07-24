@@ -22,8 +22,8 @@ public class PinResponseDto {
         this.nickname = pin.getUser().getNickname();
         this.likeCounts = pin.getPinLikes().size();
 
-        if (pin.getUser().getUserimage() != null) {
-            this.userImageUrl = pin.getUser().getUserimage().getImage();
+        if (pin.getUser().getImage() != null) {
+            this.userImageUrl = pin.getUser().getImage().getImage();
         } else {
             this.userImageUrl = null;
         }
