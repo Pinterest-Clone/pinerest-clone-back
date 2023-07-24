@@ -4,9 +4,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.pinterest_clone.config.S3Config;
+import com.sparta.pinterest_clone.pin.PinRepository.PinImageRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
+import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
+import com.sparta.pinterest_clone.pin.entity.PinImage;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.entity.User;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
@@ -31,19 +35,25 @@ public class PinService {
     private final PinRepository pinRepository;
     private final UserRepository userRepository;
     private final AmazonS3 amazonS3;
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
+    private final String bucket;
 
 
 
-//    public List<PinResponseDto> getAllPins() {
-//        List<Pin> pinlist = pinRepository.findAllByOrderByCreatedAtDesc();
-//        List<PinResponseDto> pinResponseDtoList = new ArrayList();
-//        for (pin:pinlist) {
-//            pinResponseDtoList.add(pin);
-//        }
-//        return ;
-//    }
+    public List<PinResponseDto> getAllPins() {
+        List<Pin> pinlist = pinRepository.findAllByOrderByCreatedAtDesc();
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin: pinlist
+             ) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(),pin.getImage().getImage()));
+        }
+        return pinResponseDtoList;
+    }
+
+
+    public PinResponseDto getPin(Long pinId) {
+        Pin pin = pinRepository.findById(pinId).orElseThrow(()-> new IllegalArgumentException("게시글이 없습니다."));
+        return new PinResponseDto(pin);
+    }
 
     @Transactional
     public ResponseEntity<String> updatePin(Long pinId, PinRequestDto pinRequestDto ,UserDetailsImpl userDetails) {
@@ -65,11 +75,13 @@ public class PinService {
                 .orElseThrow(()->new IllegalArgumentException("회원이 없습니다."));
         if(checkAuthority(user,userDetails)){
             pinRepository.delete(pin);
-            //pin에 연관된 이미지를 버킷에서 전부 삭제
-            for (String key : pin.getImage().keySet()) {
-                DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
-                amazonS3.deleteObject(deleteObjectRequest);
-            }
+//            //pin에 연관된 이미지를 버킷에서 전부 삭제
+//            for (String key : pin.getImage().keySet()) {
+//                DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, key);
+//                amazonS3.deleteObject(deleteObjectRequest);
+//            }
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, pin.getImage().getImageKey());
+            amazonS3.deleteObject(deleteObjectRequest);
             return new ResponseEntity("핀 삭제 성공",HttpStatus.OK);
         }else{
             return new ResponseEntity("핀 삭제 실패",HttpStatus.UNAUTHORIZED);
@@ -118,10 +130,11 @@ public class PinService {
         //S3 bucket에 put.(등록)
         amazonS3.putObject(request);
 
-        //S3 bucket에 저장된 이미지의 키 값과 url을 Map자료구조에 담는다.
-        Map<String, String> S3ObjectUrl = new LinkedHashMap<>();
-        S3ObjectUrl.put(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
+//        //S3 bucket에 저장된 이미지의 키 값과 url을 Map자료구조에 담는다.
+//        Map<String, String> S3ObjectUrl = new LinkedHashMap<>();
+//        S3ObjectUrl.put(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
 
+        PinImage S3ObjectUrl = new PinImage(fileUuid,amazonS3.getUrl(bucket, fileUuid).toString());
         Pin pin = new Pin(pinRequestDto, user, S3ObjectUrl);
         pinRepository.save(pin);
         return ResponseEntity.ok("핀 등록 완료.");

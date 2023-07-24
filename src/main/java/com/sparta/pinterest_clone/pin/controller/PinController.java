@@ -1,13 +1,17 @@
 package com.sparta.pinterest_clone.pin.controller;
 
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
+import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.service.PinService;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
+import com.sparta.pinterest_clone.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,10 +19,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class PinController {
     private final PinService pinService;
 
-//    @GetMapping("/pin")
-//    public PinResponseDto getAllPins(){
-//        return pinService.getAllPins();
-//    }
+    @GetMapping("/pin")
+    public List<PinResponseDto> getAllPins(){
+        return pinService.getAllPins();
+    }
+
+    @GetMapping("/pin/{pinId}")
+    public PinResponseDto getPin(@PathVariable Long pinId){
+        return pinService.getPin(pinId);
+    }
 
     @PutMapping("/pin/{pinId}")
     public ResponseEntity<String> updatePin(@PathVariable Long pinId,
