@@ -61,9 +61,12 @@ public class UserService {
 
         User user = findUser(userDetails.getUser().getUserId());
 
-        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getUserimage().getImageKey());
-        amazonS3.deleteObject(deleteObjectRequest);
-        userImageRepository.delete(user.getUserimage());
+        if(user.getUserimage()!=null){
+            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getUserimage().getImageKey());
+            amazonS3.deleteObject(deleteObjectRequest);
+            userImageRepository.delete(user.getUserimage());
+        }
+
         UserImage S3ObjectUrl = new UserImage(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
 
         user.update(requestDto, S3ObjectUrl);
