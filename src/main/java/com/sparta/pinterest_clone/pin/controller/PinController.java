@@ -19,35 +19,34 @@ public class PinController {
     private final PinService pinService;
 
     @GetMapping("/pin")
-    public List<PinResponseDto> getAllPins(){
+    public List<PinResponseDto> getAllPins() {
         return pinService.getAllPins();
+    }
+
+    @GetMapping("/pin/{pinId}")
+    public PinResponseDto getPin(@PathVariable Long pinId) {
+        return pinService.getPin(pinId);
     }
 
     @PutMapping("/pin/{pinId}")
     public ResponseEntity<String> updatePin(@PathVariable Long pinId,
                                             @RequestBody PinRequestDto pinRequestDto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return pinService.updatePin(pinId,pinRequestDto, userDetails);
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return pinService.updatePin(pinId, pinRequestDto, userDetails);
     }
 
     @DeleteMapping("/pin/{pinId}")
     public ResponseEntity<String> deletePin(@PathVariable Long pinId,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return pinService.deletePin(pinId,userDetails);
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return pinService.deletePin(pinId, userDetails);
     }
 
-//    @PostMapping("/pin")
-//    public ResponseEntity<String> createPin(@RequestPart String title,
-//                                            @RequestPart String content,
-//                                            @RequestPart MultipartFile image,
-//                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        PinRequestDto pinRequestDto = new PinRequestDto(title,content,image);
-//        return pinService.createPin(pinRequestDto, userDetails);
-//    }
-@PostMapping("/pin")
-public ResponseEntity<String> createPin(@RequestBody PinRequestDto requestDto,
-                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//    PinRequestDto pinRequestDto = new PinRequestDto(title,content,image);
-    return pinService.createPin(requestDto, userDetails);
-}
+    @PostMapping("/pin")
+    public ResponseEntity<String> createPin(@RequestPart String title,
+                                            @RequestPart String content,
+                                            @RequestPart MultipartFile image,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        PinRequestDto pinRequestDto = new PinRequestDto(title, content, image);
+        return pinService.createPin(pinRequestDto, userDetails);
+    }
 }

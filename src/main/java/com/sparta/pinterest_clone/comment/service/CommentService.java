@@ -31,8 +31,9 @@ public class CommentService {
 
         Comment commentSave = new Comment(pin, requestDto, user);
         Comment comment = commentRepository.save(commentSave);
+        CommentResponseDto responseDto = new CommentResponseDto(comment);
 
-        return new CommentResponseDto(comment);
+        return responseDto;
     }
 
     // 대댓글 작성
