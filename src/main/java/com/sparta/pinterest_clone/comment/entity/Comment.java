@@ -22,6 +22,8 @@ public class Comment extends Timestamped{
 
     private String comment;
 
+    private String nickname;
+
     private LocalDateTime createdAt;
 
     // 게시글
@@ -35,6 +37,7 @@ public class Comment extends Timestamped{
     public Comment(Pin pin, CommentRequestDto requestDto, User user) {
         this.pin = pin;
         this.comment = requestDto.getComment();
+        this.nickname = user.getNickname();
         this.user = user;
     }
 
@@ -42,6 +45,7 @@ public class Comment extends Timestamped{
         this.pin = pin;
         this.parentId = commentId;
         this.comment = requestDto.getComment();
+        this.nickname = user.getNickname();
         this.user = user;
     }
 

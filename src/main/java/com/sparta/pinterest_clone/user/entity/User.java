@@ -20,7 +20,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
-    private String username;
+    private String nickname;
     private String introduction;
     private String myUrl;
     @Column(nullable = false)
@@ -31,7 +31,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.birthday = birthday;
-        this.username = email.split("@")[0];
+        this.nickname = email.split("@")[0];
     }
     public static User of(String email, String password, String birthday) {
         return new User(email, password, birthday);
@@ -42,7 +42,7 @@ public class User {
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
-        this.username = requestDto.getUsername();
+        this.nickname = requestDto.getUsername();
     }
 
     public void setId(long l) {

@@ -19,7 +19,7 @@ public class UpdateProfileResponseDto {
         this.lastname = user.getLastName();
         this.introduction = user.getIntroduction();
         this.myurl = user.getMyUrl();
-        this.username = user.getUsername();
+        this.username = user.getNickname();
 
     }
 }

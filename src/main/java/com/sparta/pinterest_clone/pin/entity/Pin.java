@@ -23,7 +23,7 @@ public class Pin extends Timestamped{
     private String content;
 
     @ElementCollection
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Map<String, String> image;
 
     @ManyToOne

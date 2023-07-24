@@ -3,9 +3,9 @@ package com.sparta.pinterest_clone.pin.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
+import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.entity.User;
@@ -120,5 +120,12 @@ public class PinService {
         }else{
             return false;
         }
+    }
+
+    public List<PinResponseDto> getAllPins() {
+        return pinRepository.findAllByOrderByCreatedAtDesc()
+                .stream()
+                .map(PinResponseDto::new)
+                .toList();
     }
 }

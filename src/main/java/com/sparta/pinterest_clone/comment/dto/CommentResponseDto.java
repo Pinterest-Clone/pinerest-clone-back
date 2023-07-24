@@ -8,7 +8,7 @@ public class CommentResponseDto {
     private Long commentId;
     private Long parentId = null;
     private String comment;
-    private String username;
+    private String nickname;
 
     private List<String> LikesList; // 형태 바꿔서 줄 생각
 
@@ -16,6 +16,6 @@ public class CommentResponseDto {
         this.commentId = comment.getCommentId();
         this.parentId = comment.getParentId();
         this.comment = comment.getComment();
-        this.username = comment.getUser().getUsername();
+        this.nickname = comment.getUser().getNickname();
     }
 }
