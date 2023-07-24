@@ -27,6 +27,6 @@ public class UpdateProfileRequestDto {
 
     @NotBlank
     @Size(min=3, max=30, message = "사용자 이름은 3~30자여야 합니다.")
-    private String username;
+    private String nickname;
 
 }
