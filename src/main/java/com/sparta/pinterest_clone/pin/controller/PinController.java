@@ -46,7 +46,7 @@ public class PinController {
                                             @RequestPart String content,
                                             @RequestPart MultipartFile image,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        PinRequestDto pinRequestDto = new PinRequestDto(title, content, image);
-        return pinService.createPin(pinRequestDto, userDetails);
+        PinRequestDto pinRequestDto = new PinRequestDto(title, content);
+        return pinService.createPin(pinRequestDto ,image, userDetails);
     }
 }

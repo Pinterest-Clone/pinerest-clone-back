@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.user.entity;
 
+import com.sparta.pinterest_clone.pin.entity.PinImage;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import lombok.Setter;
 public class User {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-    private String profileImage;
+
     private String firstName;
     private String lastName;
     @Column(nullable = false)
@@ -26,6 +27,9 @@ public class User {
     private String myUrl;
     @Column(nullable = false)
     private String birthday;
+
+//    @OneToOne(cascade = CascadeType.ALL)
+//    private UserImage userimage;
 
     // 테스트 후 privete로 변경할 것
     public User(String email, String password, String birthday) {
@@ -43,7 +47,7 @@ public class User {
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
-        this.username = requestDto.getUsername();
+        this.nickname = requestDto.getNickname();
     }
 
     public void setId(long l) {

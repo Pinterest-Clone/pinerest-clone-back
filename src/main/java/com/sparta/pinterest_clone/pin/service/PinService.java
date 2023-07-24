@@ -87,14 +87,15 @@ public class PinService {
         }
     }
 
-    public ResponseEntity<String> createPin(PinRequestDto pinRequestDto,
+    public ResponseEntity<String> createPin(PinRequestDto pinRequestDto
+                                            , MultipartFile image,
                                             UserDetailsImpl userDetails) {
 
 //        User
         User user = userDetails.getUser();
 
         //파일 정보
-        MultipartFile file = pinRequestDto.getImage();
+        MultipartFile file = image;
         List<String> fileExtensions = Arrays.asList("jpg", "png", "webp", "heif", "heic", "gif", "jpeg");
         String path = Paths.get(file.getOriginalFilename()).toString(); // 원본 파일명으로 파일 경로 생성
         String extension = StringUtils.getFilenameExtension(path); // 확장자명

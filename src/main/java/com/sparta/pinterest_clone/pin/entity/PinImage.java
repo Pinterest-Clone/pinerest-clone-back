@@ -9,10 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PinImage {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
     private String imageKey;
 
     @Column(nullable = false)

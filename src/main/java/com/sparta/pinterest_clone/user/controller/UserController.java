@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +26,9 @@ public class UserController {
 
     @PutMapping("/settings/profile")
     public UpdateProfileResponseDto updateProfile(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                           @RequestBody UpdateProfileRequestDto requestDto){
+                                           @RequestPart(required = false) MultipartFile userImage,
+                                           @RequestPart UpdateProfileRequestDto requestDto){
 
-        return userService.updateProfile(userDetails, requestDto);
+        return userService.updateProfile(userDetails, requestDto,userImage);
     }
 }
