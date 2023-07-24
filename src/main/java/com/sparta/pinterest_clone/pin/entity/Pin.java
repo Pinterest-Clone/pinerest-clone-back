@@ -6,6 +6,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity //객체?
 @Getter
 @NoArgsConstructor
@@ -31,6 +34,8 @@ public class Pin extends Timestamped {
 //    private List<String> tags;
 
     //pinlike
+    @OneToMany(mappedBy = "pin", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<PinLike> pinLikes = new ArrayList<>();
 
     public Pin(PinRequestDto postRequestDto, User user, PinImage pinImage) {
         this.title = postRequestDto.getTitle();

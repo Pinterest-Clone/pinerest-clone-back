@@ -49,4 +49,10 @@ public class PinController {
         PinRequestDto pinRequestDto = new PinRequestDto(title, content);
         return pinService.createPin(pinRequestDto, image, userDetails);
     }
+
+    @PostMapping("/pin/{pinId}/like")
+    public ResponseEntity<String> likePin(@PathVariable Long pinId,
+                                          @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return pinService.likePin(pinId, userDetails);
+    }
 }

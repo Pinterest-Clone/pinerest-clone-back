@@ -2,11 +2,13 @@ package com.sparta.pinterest_clone.pin.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.sparta.pinterest_clone.pin.PinRepository.PinLikeRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.pin.entity.PinImage;
+import com.sparta.pinterest_clone.pin.entity.PinLike;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.entity.User;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
@@ -28,6 +30,7 @@ import java.util.List;
 public class PinService {
     private final PinRepository pinRepository;
     private final UserRepository userRepository;
+    private final PinLikeRepository pinLikeRepository;
     private final AmazonS3 amazonS3;
     private final String bucket;
     private final ImageUtil imageUtil;
@@ -103,6 +106,21 @@ public class PinService {
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<String> likePin(Long pinId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        Pin pin = pinRepository.findById(pinId).orElseThrow(()->new IllegalArgumentException("핀이 없습니다."));
+        PinLike pinLike =  pinLikeRepository.findByUserAndPin(user,pin).orElse(null);
+        if(pinLike == null){
+            PinLike newPinLike = new PinLike(user,pin);
+            pinLikeRepository.save(newPinLike);
+            return ResponseEntity.ok("좋아요 성공");
+        }else{
+            pinLikeRepository.delete(pinLike);
+            return ResponseEntity.ok("좋아요 취소");
         }
     }
 }

@@ -1,12 +1,16 @@
 package com.sparta.pinterest_clone.user.entity;
 
 import com.sparta.pinterest_clone.pin.entity.PinImage;
+import com.sparta.pinterest_clone.pin.entity.PinLike;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter @Entity @Setter
 @NoArgsConstructor // (access = AccessLevel.PROTECTED)
@@ -35,6 +39,9 @@ public class User {
 
     @OneToOne(cascade = CascadeType.ALL)
     private UserImage userimage;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<PinLike> pinLikes = new ArrayList<>();
 
     public User(String email, String password, String birthday) {
         this.email = email;
