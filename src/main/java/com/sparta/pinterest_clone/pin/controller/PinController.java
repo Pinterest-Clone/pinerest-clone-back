@@ -4,7 +4,6 @@ import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.service.PinService;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
-import com.sparta.pinterest_clone.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,26 +19,26 @@ public class PinController {
     private final PinService pinService;
 
     @GetMapping("/pin")
-    public List<PinResponseDto> getAllPins(){
+    public List<PinResponseDto> getAllPins() {
         return pinService.getAllPins();
     }
 
     @GetMapping("/pin/{pinId}")
-    public PinResponseDto getPin(@PathVariable Long pinId){
+    public PinResponseDto getPin(@PathVariable Long pinId) {
         return pinService.getPin(pinId);
     }
 
     @PutMapping("/pin/{pinId}")
     public ResponseEntity<String> updatePin(@PathVariable Long pinId,
                                             @RequestBody PinRequestDto pinRequestDto,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return pinService.updatePin(pinId,pinRequestDto, userDetails);
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return pinService.updatePin(pinId, pinRequestDto, userDetails);
     }
 
     @DeleteMapping("/pin/{pinId}")
     public ResponseEntity<String> deletePin(@PathVariable Long pinId,
-                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        return pinService.deletePin(pinId,userDetails);
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return pinService.deletePin(pinId, userDetails);
     }
 
     @PostMapping("/pin")
@@ -47,7 +46,7 @@ public class PinController {
                                             @RequestPart String content,
                                             @RequestPart MultipartFile image,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        PinRequestDto pinRequestDto = new PinRequestDto(title,content,image);
+        PinRequestDto pinRequestDto = new PinRequestDto(title, content, image);
         return pinService.createPin(pinRequestDto, userDetails);
     }
 }

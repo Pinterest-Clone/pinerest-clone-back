@@ -6,12 +6,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
-
 @Entity //객체?
 @Getter
 @NoArgsConstructor
-public class Pin extends Timestamped{
+public class Pin extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +39,7 @@ public class Pin extends Timestamped{
         this.user = user;
     }
 
-    public void update(PinRequestDto pinRequestDto){
+    public void update(PinRequestDto pinRequestDto) {
         this.title = pinRequestDto.getTitle();
         this.content = pinRequestDto.getContent();
     }

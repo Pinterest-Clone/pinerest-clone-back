@@ -3,7 +3,6 @@ package com.sparta.pinterest_clone.pin.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Getter
@@ -19,7 +18,7 @@ public class PinImage {
     @Column(nullable = false)
     private String image;
 
-    public PinImage(String imageKey, String image){
+    public PinImage(String imageKey, String image) {
         this.imageKey = imageKey;
         this.image = image;
     }
