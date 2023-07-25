@@ -15,7 +15,6 @@ import java.util.List;
 public class PinResponseDto {
     Long pin_id;
     String title;
-    String content;
     String imageUrl;
     String nickname;
     String userImageUrl;
@@ -40,6 +39,7 @@ public class PinResponseDto {
         }
     }
 
+    String content;
     public PinResponseDto(Long id, String imageUrl) {
         this.pin_id = id;
         this.imageUrl = imageUrl;
