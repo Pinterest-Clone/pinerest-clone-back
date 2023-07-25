@@ -70,7 +70,7 @@ public class CommentService {
         Comment comment = findComment(commentId);
         checkAuthority(comment, user);
 
-        commentRepository.findAllByParentId(commentId).forEach(commentRepository::delete);
+        commentRepository.findAllByPinId(commentId).forEach(commentRepository::delete);
         commentRepository.delete(comment);
 
         return new ResponseDto("삭제성공");

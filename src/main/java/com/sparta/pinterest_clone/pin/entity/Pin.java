@@ -26,10 +26,6 @@ public class Pin extends Timestamped{
     @Column(nullable = false, length = 255)
     private String content;
 
-    @ElementCollection
-    @Column(nullable = true)
-    private Map<String, String> image;
-
     @OneToOne(cascade = CascadeType.ALL)
     private Image image;
 
@@ -49,7 +45,7 @@ public class Pin extends Timestamped{
     public Pin(PinRequestDto postRequestDto, User user, Image pinImage) {
         this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
-        this.image = image;
+        this.image = pinImage;
         this.user = user;
     }
 
