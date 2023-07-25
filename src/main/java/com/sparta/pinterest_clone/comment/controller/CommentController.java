@@ -52,13 +52,12 @@ public class CommentController {
         return new ResponseEntity<>(commentService.deleteComment(commentId, userDetails), HttpStatus.OK);
     }
 
-//    @PostMapping("/comments/{commentId}/like")
-//    public ResponseEntity<ResponseDto> commentLike(@PathVariable Long pinId,
-//                                                         @PathVariable Long commentId,
-//                                                         @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//
-//        return new ResponseEntity<>(commentService.commentLike(pinId, commentId, userDetails), HttpStatus.OK);
-//    }
+    @PostMapping("/comments/{commentId}/like")
+    public ResponseEntity<ResponseDto> commentLike(@PathVariable Long pinId,
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+
+        return new ResponseEntity<>(commentService.commentLike(pinId, userDetails), HttpStatus.OK);
+    }
 
 
 }

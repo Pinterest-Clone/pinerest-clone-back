@@ -4,6 +4,8 @@ import com.sparta.pinterest_clone.comment.dto.CommentRequestDto;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.sparta.pinterest_clone.comment.dto.ResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
+import com.sparta.pinterest_clone.comment.entity.CommentLike;
+import com.sparta.pinterest_clone.comment.repository.CommentLikeRepository;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.entity.Pin;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
     private final CommentRepository commentRepository;
     private final PinRepository pinRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 댓글 작성
     @Transactional
@@ -85,6 +88,22 @@ public class CommentService {
     public void checkAuthority(Comment comment, User user) {
         if (!comment.getUser().getUserId().equals(user.getUserId())) {
             throw new AuthorizationServiceException("작성자만 삭제/수정할 수 있습니다.");
+        }
+    }
+
+    public ResponseDto commentLike(Long commentId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        Comment comment = commentRepository.findById(commentId).orElseThrow(
+                () -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+
+        CommentLike commentLike = commentLikeRepository.findByCommentAndUser(comment, user);
+        if (commentLike == null) {
+            CommentLike newCommentLike = new CommentLike(user, comment);
+            commentLikeRepository.save(newCommentLike);
+            return new ResponseDto("좋아요 성공");
+        } else {
+            commentLikeRepository.delete(commentLike);
+            return new ResponseDto("좋아요 취소");
         }
     }
 }
