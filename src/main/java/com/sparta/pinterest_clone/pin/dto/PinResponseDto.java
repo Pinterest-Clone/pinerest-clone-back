@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.pin.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.pin.entity.Pin;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PinResponseDto {
     Long pin_id;
     String title;
