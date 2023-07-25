@@ -59,7 +59,7 @@ public class GoogleService {
 
         GoogleUserInfo userInfo = getUserInfo(accessToken);
 
-        User user = signUpWithKakaoEmail(userInfo);
+        User user = signUpWithGoogleEmail(userInfo);
 //
         String jwt = jwtUtil.createJwt(user.getEmail());
 
@@ -67,7 +67,7 @@ public class GoogleService {
     }
 
 
-    private User signUpWithKakaoEmail(GoogleUserInfo userInfo) {
+    private User signUpWithGoogleEmail(GoogleUserInfo userInfo) {
         // 한 번이라도 google로그인 했는지 체크
         String googleId = userInfo.getGoogleId();
         User googleUser = userRepository.findByGoogleId(googleId).orElse(null);
