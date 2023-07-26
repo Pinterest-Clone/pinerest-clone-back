@@ -19,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
 public class UserController {
+    private final Boolean WANT_SAVED_PIN = Boolean.TRUE;
     private final UserService userService;
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody LoginRequestDto loginRequestDto){
@@ -43,14 +44,14 @@ public class UserController {
     }
 
     @GetMapping("/{nickname}/saved")
-    public ResponseEntity<List<PinResponseDto>> getLikedPins(@PathVariable String nickname) {
+    public ResponseEntity<List<PinResponseDto>> getSavedPins(@PathVariable String nickname) {
 
-        return ResponseEntity.ok(userService.getSavedPin(nickname));
+        return ResponseEntity.ok(userService.getPinsByUser(nickname, WANT_SAVED_PIN));
     }
 
     @GetMapping("/{nickname}/created")
     public ResponseEntity<List<PinResponseDto>> getCreatedPins(@PathVariable String nickname) {
 
-        return ResponseEntity.ok(userService.getCreatedPins(nickname));
+        return ResponseEntity.ok(userService.getPinsByUser(nickname, !WANT_SAVED_PIN));
     }
 }

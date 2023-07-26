@@ -122,8 +122,6 @@ public class PinService {
                                                        UserDetailsImpl userDetails) {
 
         User user = userDetails.getUser();
-        //파일 정보
-        MultipartFile file = image;
         //파일 검증
         if (!imageUtil.validateFile(file)) {
             throw new CustomException(HttpStatus.NOT_FOUND, "파일 검증 실패");
