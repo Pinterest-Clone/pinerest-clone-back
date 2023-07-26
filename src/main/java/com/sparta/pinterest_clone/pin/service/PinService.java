@@ -6,6 +6,7 @@ import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
+import com.sparta.pinterest_clone.exception.CustomException;
 import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.pin.PinRepository.PinLikeRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
@@ -28,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 @Slf4j(topic = "pin service")
@@ -41,6 +44,7 @@ public class PinService {
     private final AmazonS3 amazonS3;
     private final String bucket;
     private final ImageUtil imageUtil;
+    private ConcurrentMap<String, String> imageUrlCache = new ConcurrentHashMap<>();
 
 
     public List<PinResponseDto> getAllPins() {
@@ -65,7 +69,8 @@ public class PinService {
 
 
     public PinResponseDto getPin(Long pinId) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
+
         List<Comment> comments = commentRepository.findAllByPinId(pinId);
 
 
@@ -90,10 +95,10 @@ public class PinService {
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+    public ResponseEntity<String> updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
         User user = userRepository.findById(pin.getUser().getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "회원이 없습니다."));
         if (checkAuthority(user, userDetails)) {
             pin.update(pinRequestDto);
             return new ResponseEntity("핀 수정 성공", HttpStatus.OK);
@@ -104,10 +109,10 @@ public class PinService {
 
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> deletePin(Long pinId, UserDetailsImpl userDetails) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
+    public ResponseEntity<String> deletePin(Long pinId, UserDetailsImpl userDetails) {
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
         User user = userRepository.findById(pin.getUser().getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "회원이 없습니다."));
         if (checkAuthority(user, userDetails)) {
             DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, pin.getImage().getImageKey());
             amazonS3.deleteObject(deleteObjectRequest);
@@ -127,7 +132,7 @@ public class PinService {
         MultipartFile file = image;
         //파일 검증
         if (!imageUtil.validateFile(file)) {
-            throw new IllegalArgumentException("파일 검증 실패");
+            throw new CustomException(HttpStatus.NOT_FOUND, "파일 검증 실패");
         }
         //S3에 업로드 후 이미지 키 반환.
         String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);

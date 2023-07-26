@@ -7,13 +7,13 @@ import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.entity.CommentLike;
 import com.sparta.pinterest_clone.comment.repository.CommentLikeRepository;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
+import com.sparta.pinterest_clone.exception.CustomException;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.entity.User;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +29,7 @@ public class CommentService {
     public CommentResponseDto createComment(Long pinId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
 
-        Pin pin = pinRepository.findById(pinId).orElseThrow(()
-                -> new EntityNotFoundException("게시글을 찾을 수 없습니다"));
+        Pin pin = findPin(pinId);
 
         Comment commentSave = new Comment(pin, requestDto, user);
         Comment comment = commentRepository.save(commentSave);
@@ -43,13 +42,8 @@ public class CommentService {
     public CommentResponseDto createSubComment(Long pinId, Long commentId, CommentRequestDto requestDto, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
 
-        Pin pin = pinRepository.findById(pinId).orElseThrow(
-                () -> new EntityNotFoundException("게시글을 찾을 수 없습니다")
-        );
-
-        Comment parentComment = commentRepository.findById(commentId).orElseThrow(
-                () -> new EntityNotFoundException("부모 댓글을 찾을 수 없습니다")
-        );
+        Pin pin = findPin(pinId);
+        Comment parentComment = findComment(commentId);
 
         Comment subComment = parentComment.createSubComment(pin, commentId, requestDto, user);
         Comment saveSubComment = commentRepository.save(subComment);
@@ -79,22 +73,9 @@ public class CommentService {
         return new ResponseDto("삭제성공");
     }
 
-    private Comment findComment(Long id) {
-        return commentRepository.findById(id).orElseThrow(() ->
-                new NullPointerException("존재하지 않는 댓글 입니다.")
-        );
-    }
-
-    public void checkAuthority(Comment comment, User user) {
-        if (!comment.getUser().getUserId().equals(user.getUserId())) {
-            throw new AuthorizationServiceException("작성자만 삭제/수정할 수 있습니다.");
-        }
-    }
-
     public ResponseDto commentLike(Long commentId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+        Comment comment = findComment(commentId);
 
         CommentLike commentLike = commentLikeRepository.findByCommentAndUser(comment, user);
         if (commentLike == null) {
@@ -104,6 +85,24 @@ public class CommentService {
         } else {
             commentLikeRepository.delete(commentLike);
             return new ResponseDto("좋아요 취소");
+        }
+    }
+
+    private Pin findPin(Long pinId) {
+        return pinRepository.findById(pinId).orElseThrow(
+                () -> new CustomException(HttpStatus.BAD_REQUEST, "게시글을 찾을 수 없습니다")
+        );
+    }
+
+    private Comment findComment(Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(() ->
+                new CustomException(HttpStatus.BAD_REQUEST, "존재하지 않는 댓글 입니다.")
+        );
+    }
+
+    public void checkAuthority(Comment comment, User user) {
+        if (!comment.getUser().getUserId().equals(user.getUserId())) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "작성자만 삭제/수정할 수 있습니다.");
         }
     }
 }
