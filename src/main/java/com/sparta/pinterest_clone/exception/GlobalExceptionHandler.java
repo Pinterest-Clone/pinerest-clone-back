@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
         return responseEntity;
     }
 
-    // MethodArgumentNotValidException: valid 예외 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         StringBuilder sb = new StringBuilder();

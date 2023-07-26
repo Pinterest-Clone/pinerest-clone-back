@@ -1,6 +1,6 @@
 package com.sparta.pinterest_clone.pin.controller;
 
-import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
+import com.sparta.pinterest_clone.StatusResponseDto;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.service.PinService;
@@ -35,20 +35,20 @@ public class PinController {
     }
 
     @PutMapping("/pin/{pinId}")
-    public ResponseEntity<StatusResponseDto> updatePin(@PathVariable Long pinId,
+    public StatusResponseDto updatePin(@PathVariable Long pinId,
                                                        @RequestBody PinRequestDto pinRequestDto,
                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return pinService.updatePin(pinId, pinRequestDto, userDetails);
     }
 
     @DeleteMapping("/pin/{pinId}")
-    public ResponseEntity<StatusResponseDto> deletePin(@PathVariable Long pinId,
+    public StatusResponseDto deletePin(@PathVariable Long pinId,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return pinService.deletePin(pinId, userDetails);
     }
 
     @PostMapping("/pin")
-    public ResponseEntity<StatusResponseDto> createPin(@RequestPart String title,
+    public StatusResponseDto createPin(@RequestPart String title,
                                             @RequestPart String content,
                                             @RequestPart MultipartFile image,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -57,12 +57,12 @@ public class PinController {
     }
 
     @PostMapping("/pin/{pinId}/like")
-    public ResponseEntity<StatusResponseDto> likePin(@PathVariable Long pinId,
+    public StatusResponseDto likePin(@PathVariable Long pinId,
                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
         return pinService.likePin(pinId, userDetails);
     }
     @PostMapping("/pin/{pinId}/save")
-    public ResponseEntity<StatusResponseDto> savePin(@PathVariable Long pinId,
+    public StatusResponseDto savePin(@PathVariable Long pinId,
                                           @AuthenticationPrincipal UserDetailsImpl userDetails){
         return pinService.savePin(pinId, userDetails);
     }
