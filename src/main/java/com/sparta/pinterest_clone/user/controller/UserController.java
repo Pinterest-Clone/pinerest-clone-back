@@ -45,7 +45,7 @@ public class UserController {
     @GetMapping("/{nickname}/saved")
     public ResponseEntity<List<PinResponseDto>> getLikedPins(@PathVariable String nickname) {
 
-        return ResponseEntity.ok(userService.getLikedPins(nickname));
+        return ResponseEntity.ok(userService.getSavedPin(nickname));
     }
 
     @GetMapping("/{nickname}/created")

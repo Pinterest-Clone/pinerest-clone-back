@@ -1,11 +1,11 @@
 package com.sparta.pinterest_clone.user.service;
 
-import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sparta.pinterest_clone.image.ImageRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinLikeRepository;
 import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
+import com.sparta.pinterest_clone.pin.PinRepository.PinSaveRepository;
 import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
@@ -19,7 +19,6 @@ import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ImageRepository imageRepository;
     private final PinRepository pinRepository;
-    private final PinLikeRepository pinLikeRepository;
+    private final PinSaveRepository pinSaveRepository;
     private final AmazonS3 amazonS3;
     private final String bucket;
     private final ImageUtil imageUtil;
@@ -122,11 +121,11 @@ public class UserService {
         );
     }
 
-    public List<PinResponseDto> getLikedPins(String nickname) {
+    public List<PinResponseDto> getSavedPin(String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow(
                 ()-> new RuntimeException("존재하지 않는 사용자입니다.")
         );
-        List<Pin> pinList = pinLikeRepository.findPinsByUser(user);
+        List<Pin> pinList = pinSaveRepository.findPinsByUser(user);
         List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
         for (Pin pin : pinList) {
             pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));

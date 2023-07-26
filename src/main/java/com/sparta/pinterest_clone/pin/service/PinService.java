@@ -3,6 +3,7 @@ package com.sparta.pinterest_clone.pin.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
+import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
 import com.sparta.pinterest_clone.image.Image;
@@ -89,7 +90,7 @@ public class PinService {
     }
 
     @Transactional
-    public ResponseEntity<String> updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         User user = userRepository.findById(pin.getUser().getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
@@ -103,7 +104,7 @@ public class PinService {
 
 
     @Transactional
-    public ResponseEntity<String> deletePin(Long pinId, UserDetailsImpl userDetails) {
+    public ResponseEntity<StatusResponseDto> deletePin(Long pinId, UserDetailsImpl userDetails) {
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         User user = userRepository.findById(pin.getUser().getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("회원이 없습니다."));
@@ -117,7 +118,7 @@ public class PinService {
         }
     }
 
-    public ResponseEntity<String> createPin(PinRequestDto pinRequestDto,
+    public ResponseEntity<StatusResponseDto> createPin(PinRequestDto pinRequestDto,
                                             MultipartFile image,
                                             UserDetailsImpl userDetails) {
 //        User
@@ -135,7 +136,36 @@ public class PinService {
         Image S3ObjectUrl = new Image(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
         Pin pin = new Pin(pinRequestDto, user, S3ObjectUrl);
         pinRepository.save(pin);
-        return ResponseEntity.ok("핀 등록 완료.");
+        return new ResponseEntity("핀 등록 완료.",HttpStatus.OK);
+    }
+
+    @Transactional
+    public ResponseEntity<StatusResponseDto> likePin(Long pinId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
+        PinLike pinLike = pinLikeRepository.findByUserAndPin(user, pin).orElse(null);
+        if (pinLike == null) {
+            PinLike newPinLike = new PinLike(user, pin);
+            pinLikeRepository.save(newPinLike);
+            return new ResponseEntity("좋아요 성공", HttpStatus.OK);
+        } else {
+            pinLikeRepository.delete(pinLike);
+            return new ResponseEntity("좋아요 취소", HttpStatus.OK);
+        }
+    }
+
+    public ResponseEntity<StatusResponseDto> savePin(Long pinId, UserDetailsImpl userDetails) {
+        User user = userDetails.getUser();
+        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
+        PinLike pinLike = pinLikeRepository.findByUserAndPin(user, pin).orElse(null);
+        if (pinLike == null) {
+            PinLike newPinLike = new PinLike(user, pin);
+            pinLikeRepository.save(newPinLike);
+            return new ResponseEntity("저장 성공", HttpStatus.OK);
+        } else {
+            pinLikeRepository.delete(pinLike);
+            return new ResponseEntity("저장 취소", HttpStatus.OK);
+        }
     }
 
     private boolean checkAuthority(User user, UserDetailsImpl userDetails) {
@@ -143,21 +173,6 @@ public class PinService {
             return true;
         } else {
             return false;
-        }
-    }
-
-    @Transactional
-    public ResponseEntity<String> likePin(Long pinId, UserDetailsImpl userDetails) {
-        User user = userDetails.getUser();
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
-        PinLike pinLike = pinLikeRepository.findByUserAndPin(user, pin).orElse(null);
-        if (pinLike == null) {
-            PinLike newPinLike = new PinLike(user, pin);
-            pinLikeRepository.save(newPinLike);
-            return ResponseEntity.ok("좋아요 성공");
-        } else {
-            pinLikeRepository.delete(pinLike);
-            return ResponseEntity.ok("좋아요 취소");
         }
     }
 }
