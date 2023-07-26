@@ -23,6 +23,11 @@ public class PinController {
         return pinService.getAllPins();
     }
 
+    @GetMapping("/pin/search")
+    public List<PinResponseDto> searchPin(@RequestParam String keyword){
+        return pinService.searchPin(keyword);
+    }
+
     @GetMapping("/pin/{pinId}")
     public PinResponseDto getPin(@PathVariable Long pinId) {
         return pinService.getPin(pinId);

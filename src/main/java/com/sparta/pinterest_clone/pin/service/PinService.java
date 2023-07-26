@@ -2,8 +2,6 @@ package com.sparta.pinterest_clone.pin.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
@@ -25,12 +23,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j(topic = "pin service")
 @Service
@@ -47,6 +44,16 @@ public class PinService {
 
     public List<PinResponseDto> getAllPins() {
         List<Pin> pinlist = pinRepository.findAllByOrderByCreatedAtDesc();
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin : pinlist
+        ) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+        }
+        return pinResponseDtoList;
+    }
+
+    public List<PinResponseDto> searchPin(String keyword) {
+        List<Pin> pinlist = pinRepository.searchPinsByKeywordWithPriority(keyword);
         List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
         for (Pin pin : pinlist
         ) {
