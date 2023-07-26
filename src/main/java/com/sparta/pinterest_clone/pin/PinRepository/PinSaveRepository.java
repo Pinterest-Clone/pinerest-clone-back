@@ -10,9 +10,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface PinLikeRepository extends JpaRepository<PinLike,Long> {
+public interface PinSaveRepository extends JpaRepository<PinLike,Long> {
     Optional<PinLike> findByUserAndPin(User user,Pin pin);
 
-    @Query("SELECT pl.pin FROM PinLike pl WHERE pl.user = :user")
+    @Query("SELECT pl.pin FROM PinSave pl WHERE pl.user = :user")
     List<Pin> findPinsByUser(@Param("user") User user);
 }

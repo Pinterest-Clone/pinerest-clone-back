@@ -5,10 +5,16 @@ import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sparta.pinterest_clone.exception.CustomException;
 import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.image.ImageRepository;
+import com.sparta.pinterest_clone.pin.PinRepository.PinLikeRepository;
+import com.sparta.pinterest_clone.pin.PinRepository.PinRepository;
+import com.sparta.pinterest_clone.pin.PinRepository.PinSaveRepository;
+import com.sparta.pinterest_clone.pin.dto.PinResponseDto;
+import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.security.UserDetailsImpl;
 import com.sparta.pinterest_clone.user.dto.LoginRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileRequestDto;
 import com.sparta.pinterest_clone.user.dto.UpdateProfileResponseDto;
+import com.sparta.pinterest_clone.user.dto.UserPageResponseDto;
 import com.sparta.pinterest_clone.user.entity.User;
 import com.sparta.pinterest_clone.user.repository.UserRepository;
 import com.sparta.pinterest_clone.util.ImageUtil;
@@ -20,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,6 +37,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ImageRepository imageRepository;
+    private final PinRepository pinRepository;
+    private final PinSaveRepository pinSaveRepository;
     private final AmazonS3 amazonS3;
     private final String bucket;
     private final ImageUtil imageUtil;
@@ -48,6 +58,38 @@ public class UserService {
         userRepository.save(user);
     }
 
+//    public UserPageResponseDto getUserPage(String nickname) {
+//        User user = userRepository.findByNickname(nickname).orElseThrow(
+//                () -> new RuntimeException("존재하지 않는 사용자입니다.")
+//        );
+//
+//        List<Pin> pinList = pinRepository.findByUser(user);
+//        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+//        for (Pin pin : pinList) {
+//            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+//        }
+//
+//        return UserPageResponseDto.of(user, pinResponseDtoList);
+//    }
+
+    public UserPageResponseDto getUserPage(UserDetailsImpl userDetails, String nickname) {
+        User user = userRepository.findByNickname(nickname).orElseThrow(
+                () -> new RuntimeException("존재하지 않는 사용자입니다.")
+        );
+        List<Pin> pinList = pinRepository.findByUser(user);
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin : pinList) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+        }
+
+        boolean isMyPage = false;
+        if(userDetails != null) {
+            isMyPage = userDetails.getUser().getNickname().equals(nickname);
+        }
+
+        return UserPageResponseDto.of(user, pinResponseDtoList, isMyPage);
+    }
+
     @Transactional
     public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto, MultipartFile userImage) {
 
@@ -63,7 +105,7 @@ public class UserService {
 
         User user = findUser(userDetails.getUser().getUserId());
 
-        if(user.getImage()!=null){
+        if (user.getImage() != null) {
             DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getImage().getImageKey());
             amazonS3.deleteObject(deleteObjectRequest);
             imageRepository.delete(user.getImage());
@@ -79,5 +121,31 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() ->
                 new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다.")
         );
+    }
+
+    public List<PinResponseDto> getSavedPin(String nickname) {
+        User user = userRepository.findByNickname(nickname).orElseThrow(
+                ()-> new RuntimeException("존재하지 않는 사용자입니다.")
+        );
+        List<Pin> pinList = pinSaveRepository.findPinsByUser(user);
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin : pinList) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+        }
+
+        return pinResponseDtoList;
+    }
+
+    public List<PinResponseDto> getCreatedPins(String nickname) {
+        User user = userRepository.findByNickname(nickname).orElseThrow(
+                ()-> new RuntimeException("존재하지 않는 사용자입니다.")
+        );
+        List<Pin> pinList = pinRepository.findByUser(user);
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin : pinList) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+        }
+
+        return pinResponseDtoList;
     }
 }

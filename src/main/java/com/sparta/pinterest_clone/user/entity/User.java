@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,9 @@ public class User {
         this.password = password;
         this.birthday = birthday;
         this.nickname = email.split("@")[0];
+        this.lastName = makeLastName(nickname);
     }
+
 
     public User(String email, String password, String birthday, String googleId) {
         this.email = email;
@@ -57,6 +60,7 @@ public class User {
         this.birthday = birthday;
         this.nickname = email.split("@")[0];
         this.googleId = googleId;
+        this.lastName = makeLastName(nickname);
     }
 
     public void update(UpdateProfileRequestDto requestDto, Image userimage) {
@@ -72,12 +76,17 @@ public class User {
         this.userId = l;
     }
 
-    public void update(UpdateProfileRequestDto requestDto){
+    public void update(UpdateProfileRequestDto requestDto) {
         this.firstName = requestDto.getFirstname();
         this.lastName = requestDto.getLastname();
         this.introduction = requestDto.getIntroduction();
         this.myUrl = requestDto.getMyUrl();
         this.nickname = requestDto.getNickname();
     }
-    
+
+    private String makeLastName(String nickname) {
+        String tmp = nickname.replaceAll("\\d", "");
+        return Character.toUpperCase(tmp.charAt(0)) + tmp.substring(1);
+    }
+
 }
