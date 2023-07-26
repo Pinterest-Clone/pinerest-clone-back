@@ -3,7 +3,7 @@ package com.sparta.pinterest_clone.pin.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sparta.pinterest_clone.comment.dto.CommentResponseDto;
-import com.sparta.pinterest_clone.comment.dto.StatusResponseDto;
+import com.sparta.pinterest_clone.StatusResponseDto;
 import com.sparta.pinterest_clone.comment.entity.Comment;
 import com.sparta.pinterest_clone.comment.repository.CommentRepository;
 import com.sparta.pinterest_clone.exception.CustomException;
@@ -69,7 +69,7 @@ public class PinService {
 
 
     public PinResponseDto getPin(Long pinId) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
+        Pin pin = findPin(pinId);
 
         List<Comment> comments = commentRepository.findAllByPinId(pinId);
 
@@ -95,38 +95,32 @@ public class PinService {
     }
 
     @Transactional
-    public ResponseEntity<String> updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
-        User user = userRepository.findById(pin.getUser().getUserId())
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "회원이 없습니다."));
-        if (checkAuthority(user, userDetails)) {
-            pin.update(pinRequestDto);
-            return new ResponseEntity("핀 수정 성공", HttpStatus.OK);
-        } else {
-            return new ResponseEntity("핀 수정 실패", HttpStatus.UNAUTHORIZED);
-        }
+    public StatusResponseDto updatePin(Long pinId, PinRequestDto pinRequestDto, UserDetailsImpl userDetails) {
+        Pin pin = findPin(pinId);
+        User user = findUser(userDetails.getUser().getUserId());
+        checkAuthority(user, userDetails);
+        pin.update(pinRequestDto);
+        return new StatusResponseDto(HttpStatus.OK, "핀 수정 성공");
     }
 
 
     @Transactional
-    public ResponseEntity<String> deletePin(Long pinId, UserDetailsImpl userDetails) {
-        Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
-        User user = userRepository.findById(pin.getUser().getUserId())
-                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "회원이 없습니다."));
-        if (checkAuthority(user, userDetails)) {
-            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, pin.getImage().getImageKey());
-            amazonS3.deleteObject(deleteObjectRequest);
-            pinRepository.delete(pin);
-            return new ResponseEntity("핀 삭제 성공", HttpStatus.OK);
-        } else {
-            return new ResponseEntity("핀 삭제 실패", HttpStatus.UNAUTHORIZED);
-        }
+    public StatusResponseDto deletePin(Long pinId, UserDetailsImpl userDetails) {
+        Pin pin = findPin(pinId);
+        User user = findUser(userDetails.getUser().getUserId());
+        checkAuthority(user, userDetails);
+        DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, pin.getImage().getImageKey());
+        amazonS3.deleteObject(deleteObjectRequest);
+        pinRepository.delete(pin);
+
+        return new StatusResponseDto(HttpStatus.OK, "핀 삭제 성공");
     }
 
-    public ResponseEntity<StatusResponseDto> createPin(PinRequestDto pinRequestDto,
-                                            MultipartFile image,
-                                            UserDetailsImpl userDetails) {
-//        User
+
+    public StatusResponseDto createPin(PinRequestDto pinRequestDto,
+                                                       MultipartFile file,
+                                                       UserDetailsImpl userDetails) {
+
         User user = userDetails.getUser();
         //파일 정보
         MultipartFile file = image;
@@ -141,43 +135,51 @@ public class PinService {
         Image S3ObjectUrl = new Image(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
         Pin pin = new Pin(pinRequestDto, user, S3ObjectUrl);
         pinRepository.save(pin);
-        return new ResponseEntity("핀 등록 완료.",HttpStatus.OK);
+        return new StatusResponseDto(HttpStatus.OK, "핀 등록 성공");
     }
 
     @Transactional
-    public ResponseEntity<StatusResponseDto> likePin(Long pinId, UserDetailsImpl userDetails) {
+    public StatusResponseDto likePin(Long pinId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
         PinLike pinLike = pinLikeRepository.findByUserAndPin(user, pin).orElse(null);
         if (pinLike == null) {
             PinLike newPinLike = new PinLike(user, pin);
             pinLikeRepository.save(newPinLike);
-            return new ResponseEntity("좋아요 성공", HttpStatus.OK);
+            return new StatusResponseDto(HttpStatus.OK, "좋아요 성공");
         } else {
             pinLikeRepository.delete(pinLike);
-            return new ResponseEntity("좋아요 취소", HttpStatus.OK);
+            return new StatusResponseDto(HttpStatus.OK, "좋아요 취소");
         }
     }
 
-    public ResponseEntity<StatusResponseDto> savePin(Long pinId, UserDetailsImpl userDetails) {
+    public StatusResponseDto savePin(Long pinId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
         PinLike pinLike = pinLikeRepository.findByUserAndPin(user, pin).orElse(null);
         if (pinLike == null) {
             PinLike newPinLike = new PinLike(user, pin);
             pinLikeRepository.save(newPinLike);
-            return new ResponseEntity("저장 성공", HttpStatus.OK);
+            return new StatusResponseDto(HttpStatus.OK, "저장 성공");
         } else {
             pinLikeRepository.delete(pinLike);
-            return new ResponseEntity("저장 취소", HttpStatus.OK);
+            return new StatusResponseDto(HttpStatus.OK, "저장 취소");
         }
     }
 
-    private boolean checkAuthority(User user, UserDetailsImpl userDetails) {
-        if (user.getUserId() == userDetails.getUser().getUserId()) {
-            return true;
-        } else {
-            return false;
+    public Pin findPin(Long pinId) {
+        return pinRepository.findById(pinId).orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "게시글이 없습니다."));
+    }
+
+    public User findUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, "회원이 없습니다."));
+
+    }
+
+    private void checkAuthority(User user, UserDetailsImpl userDetails) {
+        if (!userDetails.getUser().getUserId().equals(user.getUserId())) {
+            throw new CustomException(HttpStatus.FORBIDDEN, "작성자만 삭제/수정할 수 있습니다.");
         }
     }
 }

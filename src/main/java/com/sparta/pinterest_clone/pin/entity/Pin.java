@@ -1,5 +1,6 @@
 package com.sparta.pinterest_clone.pin.entity;
 
+import com.sparta.pinterest_clone.Timestamped;
 import com.sparta.pinterest_clone.image.Image;
 import com.sparta.pinterest_clone.pin.dto.PinRequestDto;
 import com.sparta.pinterest_clone.user.entity.User;
@@ -13,7 +14,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Pin extends Timestamped{
+public class Pin extends Timestamped {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

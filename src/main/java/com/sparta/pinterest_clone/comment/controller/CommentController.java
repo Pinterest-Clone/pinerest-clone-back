@@ -13,13 +13,13 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/pin/{pinId}")
+@RequestMapping("/api/pin/{pinId}/comments")
 @RequiredArgsConstructor
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping()
+    @PostMapping
     public CommentResponseDto createComment(@PathVariable Long pinId,
                                             @RequestBody @Valid CommentRequestDto requestDto,
                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -27,8 +27,7 @@ public class CommentController {
         return commentService.createComment(pinId, requestDto, userDetails);
     }
 
-    // 대댓글
-    @PostMapping("comments/{commentId}/replies")
+    @PostMapping("/{commentId}/replies")
     public CommentResponseDto createSubComment(@PathVariable Long pinId,
                                                @PathVariable Long commentId,
                                                @RequestBody @Valid CommentRequestDto requestDto,
@@ -37,7 +36,7 @@ public class CommentController {
         return commentService.createSubComment(pinId, commentId, requestDto, userDetails);
     }
 
-    @PutMapping("/comments/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<CommentResponseDto> updateComment(@PathVariable Long commentId,
                                                             @RequestBody @Valid CommentRequestDto requestDto,
                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -45,19 +44,18 @@ public class CommentController {
         return new ResponseEntity<>(commentService.updateComment(commentId, requestDto, userDetails), HttpStatus.OK);
     }
 
-    @DeleteMapping("/comments/{commentId}")
+    @DeleteMapping("/{commentId}")
     public ResponseEntity<ResponseDto> deleteComment(@PathVariable Long commentId,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return new ResponseEntity<>(commentService.deleteComment(commentId, userDetails), HttpStatus.OK);
     }
 
-    @PostMapping("/comments/{commentId}/like")
+    @PostMapping("/{commentId}/like")
     public ResponseEntity<ResponseDto> commentLike(@PathVariable Long pinId,
                                                    @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         return new ResponseEntity<>(commentService.commentLike(pinId, userDetails), HttpStatus.OK);
     }
-
 
 }

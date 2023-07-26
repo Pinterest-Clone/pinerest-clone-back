@@ -58,32 +58,16 @@ public class UserService {
         userRepository.save(user);
     }
 
-//    public UserPageResponseDto getUserPage(String nickname) {
-//        User user = userRepository.findByNickname(nickname).orElseThrow(
-//                () -> new RuntimeException("존재하지 않는 사용자입니다.")
-//        );
-//
-//        List<Pin> pinList = pinRepository.findByUser(user);
-//        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
-//        for (Pin pin : pinList) {
-//            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
-//        }
-//
-//        return UserPageResponseDto.of(user, pinResponseDtoList);
-//    }
-
     public UserPageResponseDto getUserPage(UserDetailsImpl userDetails, String nickname) {
-        User user = userRepository.findByNickname(nickname).orElseThrow(
-                () -> new RuntimeException("존재하지 않는 사용자입니다.")
-        );
+        User user = userCheck(nickname);
         List<Pin> pinList = pinRepository.findByUser(user);
         List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
         for (Pin pin : pinList) {
             pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
         }
 
-        boolean isMyPage = false;
-        if(userDetails != null) {
+        boolean isMyPage= false;
+        if (userDetails != null) {
             isMyPage = userDetails.getUser().getNickname().equals(nickname);
         }
 
@@ -91,19 +75,13 @@ public class UserService {
     }
 
     @Transactional
-    public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto, MultipartFile userImage) {
+    public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto, MultipartFile file) {
 
-        //파일 정보
-        MultipartFile file = userImage;
-
-
-        if (!imageUtil.validateFile(file)) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "파일 검증 실패");
-        }
+            imageUtil.validateFile(file);
 
         String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);
 
-        User user = findUser(userDetails.getUser().getUserId());
+        User user = userCheck(userDetails.getUser().getUserId());
 
         if (user.getImage() != null) {
             DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getImage().getImageKey());
@@ -117,35 +95,25 @@ public class UserService {
         return new UpdateProfileResponseDto(user);
     }
 
-    private User findUser(Long id) {
+    public List<PinResponseDto> getPinsByUser(String nickname, boolean wantSavedPin) {
+        User user = userCheck(nickname);
+        List<Pin> pinList = wantSavedPin ? pinSaveRepository.findPinsByUser(user) : pinRepository.findByUser(user);
+        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
+        for (Pin pin : pinList) {
+            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
+        }
+
+        return pinResponseDtoList;
+    }
+
+    public User userCheck(String nickname) {
+        return userRepository.findByNickname(nickname).orElseThrow(() ->
+                new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."));
+    }
+
+    private User userCheck(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new CustomException(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다.")
         );
-    }
-
-    public List<PinResponseDto> getSavedPin(String nickname) {
-        User user = userRepository.findByNickname(nickname).orElseThrow(
-                ()-> new RuntimeException("존재하지 않는 사용자입니다.")
-        );
-        List<Pin> pinList = pinSaveRepository.findPinsByUser(user);
-        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
-        for (Pin pin : pinList) {
-            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
-        }
-
-        return pinResponseDtoList;
-    }
-
-    public List<PinResponseDto> getCreatedPins(String nickname) {
-        User user = userRepository.findByNickname(nickname).orElseThrow(
-                ()-> new RuntimeException("존재하지 않는 사용자입니다.")
-        );
-        List<Pin> pinList = pinRepository.findByUser(user);
-        List<PinResponseDto> pinResponseDtoList = new ArrayList<>();
-        for (Pin pin : pinList) {
-            pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
-        }
-
-        return pinResponseDtoList;
     }
 }

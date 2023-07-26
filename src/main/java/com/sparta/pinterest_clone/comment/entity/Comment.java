@@ -1,5 +1,5 @@
 package com.sparta.pinterest_clone.comment.entity;
-
+import com.sparta.pinterest_clone.Timestamped;
 import com.sparta.pinterest_clone.comment.dto.CommentRequestDto;
 import com.sparta.pinterest_clone.pin.entity.Pin;
 import com.sparta.pinterest_clone.user.entity.User;
@@ -13,6 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Comment extends Timestamped {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long commentId;
@@ -27,10 +28,8 @@ public class Comment extends Timestamped {
     @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
-    // 대댓글의 부모 댓글 ID
     private Long parentId;
 
-    // 대댓글을 조회할 때 부모 댓글 정보를 함께 조회하기 위한 필드
     @Transient
     private Comment parentComment;
 
@@ -41,7 +40,6 @@ public class Comment extends Timestamped {
         this.user = user;
     }
 
-    // 대댓글 생성
     public Comment createSubComment(Pin pin, Long parentId, CommentRequestDto requestDto, User user) {
         Comment subComment = new Comment(pin, requestDto, user);
         subComment.setParentId(parentId);

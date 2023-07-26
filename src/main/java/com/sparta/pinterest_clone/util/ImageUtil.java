@@ -3,6 +3,9 @@ package com.sparta.pinterest_clone.util;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.sparta.pinterest_clone.exception.CustomException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +24,7 @@ public class ImageUtil {
 
         // 파일 null check
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("이미지가 존재하지 않습니다.");
+            throw new CustomException(HttpStatus.NOT_FOUND, "이미지가 존재하지 않습니다.");
         }
 
         String path = Paths.get(file.getOriginalFilename()).toString(); // 원본 파일명으로 파일 경로 생성
@@ -29,12 +32,12 @@ public class ImageUtil {
 
         // 파일 확장자 null check
         if (extension == null) {
-            throw new IllegalArgumentException("파일의 확장자가 잘못되었습니다");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "파일의 확장자가 잘못되었습니다");
         }
 
         // 파일 확장자 검증
         if (!fileExtensions.contains(extension.toLowerCase())) {
-            throw new IllegalArgumentException("지원되지 않는 확장자 형식입니다.");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "지원되지 않는 확장자 형식입니다.");
         }
 
         // 파일 크기 검증
