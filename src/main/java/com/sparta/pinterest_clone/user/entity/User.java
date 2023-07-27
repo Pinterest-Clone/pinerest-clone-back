@@ -22,12 +22,13 @@ public class User {
     private Long userId;
     private String googleId;
     private String firstName;
+    @Column(nullable = false)
     private String lastName;
     @Column(nullable = false)
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String nickname;
     private String introduction;
     private String myUrl;

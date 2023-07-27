@@ -13,16 +13,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseDto> handleCustomException(CustomException ex) {
         log.error("CustomException error: {}", ex.getErrorMessage());
         ExceptionResponseDto responseDto = new ExceptionResponseDto(ex.getErrorMessage());
-        ResponseEntity<ExceptionResponseDto> responseEntity = new ResponseEntity<>(responseDto, ex.getHttpStatusCode());
-        return responseEntity;
+        return new ResponseEntity<>(responseDto, ex.getHttpStatusCode());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponseDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         StringBuilder sb = new StringBuilder();
-        ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            sb.append(error.getDefaultMessage()).append(" / ");
-        });
+        ex.getBindingResult().getFieldErrors().forEach(error -> sb.append(error.getDefaultMessage()).append(" / "));
         sb.setLength(sb.length() - 3);
         String errorMessage = sb.toString();
         return new ResponseEntity<>(new ExceptionResponseDto(errorMessage), ex.getStatusCode());

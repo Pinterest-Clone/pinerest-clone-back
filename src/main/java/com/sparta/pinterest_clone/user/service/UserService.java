@@ -66,7 +66,7 @@ public class UserService {
             pinResponseDtoList.add(new PinResponseDto(pin.getId(), pin.getImage().getImage()));
         }
 
-        boolean isMyPage= false;
+        boolean isMyPage = false;
         if (userDetails != null) {
             isMyPage = userDetails.getUser().getNickname().equals(nickname);
         }
@@ -76,22 +76,25 @@ public class UserService {
 
     @Transactional
     public UpdateProfileResponseDto updateProfile(UserDetailsImpl userDetails, UpdateProfileRequestDto requestDto, MultipartFile file) {
-
+        User user = userCheck(userDetails.getUser().getUserId());
+        if(file != null) {
             imageUtil.validateFile(file);
 
-        String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);
+            String fileUuid = imageUtil.uploadFileToS3(file, amazonS3, bucket);
 
-        User user = userCheck(userDetails.getUser().getUserId());
+            if (user.getImage() != null) {
+                DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getImage().getImageKey());
+                amazonS3.deleteObject(deleteObjectRequest);
+                imageRepository.delete(user.getImage());
+            }
 
-        if (user.getImage() != null) {
-            DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, user.getImage().getImageKey());
-            amazonS3.deleteObject(deleteObjectRequest);
-            imageRepository.delete(user.getImage());
+            Image S3ObjectUrl = new Image(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
+
+            user.update(requestDto, S3ObjectUrl);
         }
-
-        Image S3ObjectUrl = new Image(fileUuid, amazonS3.getUrl(bucket, fileUuid).toString());
-
-        user.update(requestDto, S3ObjectUrl);
+        else {
+            user.update(requestDto);
+        }
         return new UpdateProfileResponseDto(user);
     }
 
