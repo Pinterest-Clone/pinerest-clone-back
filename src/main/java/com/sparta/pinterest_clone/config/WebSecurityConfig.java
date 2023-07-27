@@ -79,8 +79,12 @@ public class WebSecurityConfig {
                                 .requestMatchers(GET, "/api/v1/oauth2/google", "/login/oauth2/code/google").permitAll()
                                 .requestMatchers(POST, "/api/users/**").permitAll()
                                 .requestMatchers(GET, "/api/users/**", "/api/pin/**").permitAll()
+                                .requestMatchers("/chat").permitAll()
+                                .requestMatchers("/ws/**").permitAll()
 
                 );
+
+
 
         return http.build();
     }

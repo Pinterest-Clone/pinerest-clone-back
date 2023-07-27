@@ -112,7 +112,6 @@ public class PinService {
         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, pin.getImage().getImageKey());
         amazonS3.deleteObject(deleteObjectRequest);
         pinRepository.delete(pin);
-
         return new StatusResponseDto(HttpStatus.OK, "핀 삭제 성공");
     }
 
@@ -151,6 +150,7 @@ public class PinService {
         }
     }
 
+    @Transactional
     public StatusResponseDto savePin(Long pinId, UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         Pin pin = pinRepository.findById(pinId).orElseThrow(() -> new IllegalArgumentException("핀이 없습니다."));
